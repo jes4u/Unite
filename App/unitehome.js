@@ -1,21 +1,20 @@
 function openNav() {
-  document.getElementById("mySidenav").style.width = "250px";
-  document.getElementById("mapcontent").style.marginLeft = "250px";
+  document.getElementById("mySidenav").style.width = "20%";
+  document.getElementById("mapcontent").style.marginLeft = "20%";
+  document.getElementById("slideMenu").style.display = "none";
 }
 
 function closeNav() {
   document.getElementById("mySidenav").style.width = "0";
   document.getElementById("mapcontent").style.marginLeft = "0";
+  document.getElementById("slideMenu").style.display = "block";
 }
 
-function openfilter() {
-  if(document.getElementById("population").checked = true){
-    document.getElementById("populationFilter").style.display = "block";
-  }
-  if(document.getElementById("gdp").checked == true){
-    document.getElementById("gdpFilter").style.visibility = visible;
-  }
-  if(document.getElementById("carbon").checked == true){
-    document.getElementById("carbonFilter").style.visibility = visible;
+function openfilter(name) {
+    console.log(name);
+  if(document.getElementById(name).style.display === "none"){
+    document.getElementById(name).style.display = "inline";
+  } else {
+    document.getElementById(name).style.display = "none";
   }
 }
