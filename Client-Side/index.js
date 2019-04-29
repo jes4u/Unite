@@ -28,9 +28,21 @@ $(document).ready(function() {
                 { 
                     type: "checkbox",
                     name: "GDP", 
+                    value: "gdp",
+                    onclick: "createGDP();" 
+                },
+                { 
+                    type: "checkbox", 
+                    name: "Population", 
+                    value: "population", 
+                    onclick: "createGDP();" 
+                },
+                { 
+                    type: "checkbox", 
+                    name: "Carbon Emissions", 
+                    value: "carbon", 
                     onclick: "createGDP();" 
                 }
-                ,{ type: "link", name: "Link 1 (github.com)", href: "http://github.com", icon: "icon-local-carwash" }
                 // { type: "link", name: "Link 2 (google.com)", href: "http://google.com", icon: "icon-cloudy" },
                 // { type: "button", name: "Button 1", onclick: "alert('button 1 clicked !')", icon: "icon-potrait" },
                 // { type: "button", name: "Button 2", onclick: "button2_click();", icon: "icon-local-dining" },
