@@ -1,5 +1,25 @@
 'use strict';
 
+var values = {
+    population: 0,
+    gdp: 0,
+    carbon: 0
+};
+
+var sliderValues = {
+    population : {
+        min: 0,
+        max: 100
+    },
+    gdp : {
+        min: 1,
+        max: 101
+    },
+    carbon : {
+        min: 2,
+        max: 102
+    }
+}
 
 $(document).ready(function() {
 
@@ -29,24 +49,26 @@ $(document).ready(function() {
                     type: "checkbox",
                     name: "GDP", 
                     value: "gdp",
-                    onclick: "createGDP();" 
+                    onclick: "activateSlider('gdp');",
+                    min: sliderValues.gdp.min,
+                    max: sliderValues.gdp.max
                 },
                 { 
                     type: "checkbox", 
                     name: "Population", 
                     value: "population", 
-                    onclick: "createGDP();" 
+                    onclick: "activateSlider('population');",
+                    min: sliderValues.population.min,
+                    max: sliderValues.population.max 
                 },
                 { 
                     type: "checkbox", 
                     name: "Carbon Emissions", 
                     value: "carbon", 
-                    onclick: "createGDP();" 
+                    onclick: "activateSlider('carbon');" ,
+                    min: sliderValues.carbon.min,
+                    max: sliderValues.carbon.max
                 }
-                // { type: "link", name: "Link 2 (google.com)", href: "http://google.com", icon: "icon-cloudy" },
-                // { type: "button", name: "Button 1", onclick: "alert('button 1 clicked !')", icon: "icon-potrait" },
-                // { type: "button", name: "Button 2", onclick: "button2_click();", icon: "icon-local-dining" },
-                // { type: "link", name: "Link 3 (stackoverflow.com)", href: 'http://stackoverflow.com', icon: "icon-bike" },
             ]
         }
     });
@@ -62,17 +84,16 @@ $(document).ready(function() {
     
 });
 
-function button2_click(){
-    alert('button 2 clicked !!!');
-}
-function createGDP() {
-    alert('hi');
-    let gdpDiv = document.createElement("div");
-    let gdpSlider = document.createElement("input");
-    gdpSlider.setAttribute("type", "range");
-    gdpSlider.setAttribute("max", "5");
-    gdpSlider.setAttribute("min", "0");
-    gdpDiv.appendChild(gdpSlider);
-
+function activateSlider(element) {
+    console.log(element);
+    let checkboxEle = document.getElementById(element + "ID");
+    let sliderEle = document.getElementById(element + "SliderID");
+    if( checkboxEle.checked == true ) {
+        sliderEle.style.display = "block";
+    } else {
+        sliderEle.style.display = "none";
+    }
+    
+    //need if statements to remove sliders
 }
 
