@@ -89,11 +89,18 @@ function activateSlider(element) {
     let checkboxEle = document.getElementById(element + "ID");
     let sliderEle = document.getElementById(element + "SliderID");
     if( checkboxEle.checked == true ) {
-        sliderEle.style.display = "block";
+        sliderEle.parentElement.parentElement.parentElement.style.display = "block";
     } else {
-        sliderEle.style.display = "none";
+        sliderEle.parentElement.parentElement.parentElement.style.display = "none";
     }
     
-    //need if statements to remove sliders
+}
+
+//implement way to show value changing
+
+//store values when submit button
+function updateSliderValue(element, value) {
+    console.log(element + " has value " + value);
+
 }
 
