@@ -101,6 +101,11 @@ function activateSlider(element) {
 //store values when submit button
 function updateSliderValue(element, value) {
     console.log(element + " has value " + value);
+    values[element] = value
 
 }
 
+function submitValues() {
+    console.log(values);
+    // Run geojson query 
+}
