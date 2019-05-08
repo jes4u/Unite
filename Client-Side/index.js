@@ -19,16 +19,21 @@ $(document).ready(function() {
 
     mymap.zoomControl.setPosition('bottomright');
 
+    //popup proto
+    $.getJSON("sample.geojson", function(data) {
+      var dataLayer = L.geoJson(data, {onEachFeature: addPopup}).addTo(mymap);
+      console.log("here");
+    });
 
     var searchboxControl=createSearchboxControl();
     var control = new searchboxControl({
         sidebarTitleText: 'Header',
         sidebarMenuItems: {
             Items: [
-                { 
+                {
                     type: "checkbox",
-                    name: "GDP", 
-                    onclick: "createGDP();" 
+                    name: "GDP",
+                    onclick: "createGDP();"
                 }
                 ,{ type: "link", name: "Link 1 (github.com)", href: "http://github.com", icon: "icon-local-carwash" }
                 // { type: "link", name: "Link 2 (google.com)", href: "http://google.com", icon: "icon-cloudy" },
@@ -47,8 +52,31 @@ $(document).ready(function() {
     }
     mymap.addControl(control);
 
-    
+
 });
+
+function addPopup(feature, layer) {
+  layer.bindPopup(popupContent(feature));
+}
+
+function popupContent(feature) {
+  var content = document.createElement("div");
+  content.style.float = "left";
+  var country = document.createElement("p");
+  country.innerHTML = "Country: " + feature.properties.NAME_0;
+  var city = document.createElement("p");
+  city.innerHTML = "City/Province: " + feature.properties.NAME_1;
+  var county = document.createElement("p");
+  county.innerHTML = "County: " + feature.properties.NAME_2;
+  var link = document.createElement("a");
+  link.title = "link title";
+  link.href = "www.google.com/" + feature.properties.NAME_0 + " " + feature.properties.NAME_1 + " " + feature.properties.NAME_2 + " population";
+  content.appendChild(country);
+  content.appendChild(city);
+  content.appendChild(county);
+  content.appendChild(link);
+  return content;
+}
 
 function button2_click(){
     alert('button 2 clicked !!!');
@@ -63,4 +91,3 @@ function createGDP() {
     gdpDiv.appendChild(gdpSlider);
 
 }
-
