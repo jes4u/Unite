@@ -1,0 +1,109 @@
+{
+    "python.pythonPath": "c:/Users/Chezz/Documents/info441/myvirtual/Scripts/python.exe",
+    "sqltools.connections": [
+        {
+            "askForPassword": false,
+            "connectionTimeout": 30,
+            "database": "aprildb",
+            "dialect": "MSSQL",
+            "domain": null,
+            "name": "apriltemp.database.windows.net",
+            "port": 1433,
+            "server": "127.0.0.1",
+            "username": "skadmin"
+        },
+        {
+            "askForPassword": true,
+            "connectionTimeout": 30,
+            "database": "aprildb",
+            "dialect": "MySQL",
+            "domain": null,
+            "name": "apriltemp.database.windows.net",
+            "port": 3306,
+            "server": "127.0.0.1",
+            "username": "skadmin"
+        },
+        {
+            "askForPassword": false,
+            "connectionTimeout": 30,
+            "database": "aprildb",
+            "dialect": "MySQL",
+            "domain": null,
+            "name": "apriltemp",
+            "port": 3306,
+            "server": "apriltemp.database.windows.net",
+            "username": "skadmin"
+        },
+        {
+            "askForPassword": false,
+            "connectionTimeout": 30,
+            "database": "aprildb",
+            "dialect": "MSSQL",
+            "domain": "apriltemp.database.windows.net",
+            "name": "apriltemp.database.windows.net",
+            "password": "Bubbles2!",
+            "port": 1433,
+            "server": "apriltemp.database.windows.net",
+            "username": "skadmin"
+        },
+        {
+            "askForPassword": false,
+            "connectionTimeout": 30,
+            "database": "aprildb",
+            "dialect": "MSSQL",
+            "domain": "apriltemp.database.windows.net",
+            "name": "april",
+            "password": "Bubbles2!",
+            "port": 1433,
+            "server": "127.0.0.1",
+            "username": "skadmin"
+        },
+        {
+            "askForPassword": false,
+            "connectionTimeout": 30,
+            "database": "aprildb",
+            "dialect": "MSSQL",
+            "domain": "apriltemp.database.windows.net",
+            "name": "apriltemp.database.windows.net",
+            "password": "Bubbles2!",
+            "port": 1433,
+            "server": "127.0.0.1",
+            "username": "skadmin"
+        },
+        {
+            "askForPassword": false,
+            "connectionTimeout": 30,
+            "database": "aprildb",
+            "dialect": "MySQL",
+            "domain": "apriltemp.database.windows.net",
+            "name": "apriltemp.database.windows.net",
+            "password": "Bubbles2!",
+            "port": 1433,
+            "server": "127.0.0.1",
+            "username": "skadmin"
+        },
+        {
+            "askForPassword": false,
+            "connectionTimeout": 30,
+            "database": "aprildb",
+            "dialect": "MSSQL",
+            "domain": "apriltemp.database.windows.net",
+            "name": "aprilll",
+            "password": "Bubbles2!",
+            "port": 1433,
+            "server": "127.0.0.1",
+            "username": "skadmin"
+        },
+        {
+            "askForPassword": false,
+            "connectionTimeout": 30,
+            "database": "aprildb",
+            "dialect": "MSSQL",
+            "domain": null,
+            "name": "apriltemp.database.windows.net",
+            "port": 1433,
+            "server": "127.0.0.1",
+            "username": "skadmin"
+        }
+    ],
+}
