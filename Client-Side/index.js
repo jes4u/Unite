@@ -84,11 +84,43 @@ $(document).ready(function() {
         if (!searchkeywords) {
             searchkeywords = "The search call back is clicked !!"
         }
-        alert(searchkeywords);
+        
+        onClickSearch(searchkeywords)
     }
     mymap.addControl(control);
 
+    var search;
+    function onClickSearch(input) {
+        //var input = document.getElementById('searchbox').value;
+        $.getJSON("../citydatatest.geojson", function(data){
+            if (typeof search != "undefined") {
+                search.clearLayers();
+            }
+            var selected;
+            search = L.geoJson(data, {filter: function(feature) {
+                selected = feature;
+                if (feature.properties.NAME_2 == null) {
+                    return false;
+                }
+                return feature.properties.NAME_2.toLowerCase() == input.toLowerCase();
+            }}).addTo(mymap).on('click', function() {useLocation(selected);});
+            mymap.fitBounds(search.getBounds());
+        });
+    }
 
+    function useLocation(selected) {
+        $.getJSON("../citydatatest.geojson", function(data){
+            if (typeof search != "undefined") {
+                search.clearLayers();
+            }
+            search = L.geoJson(data, {filter: function(feature) {
+                return ((feature.properties.POPULATION > (selected.properties.POPULATION * 0.99) && 
+                        feature.properties.POPULATION < (selected.properties.POPULATION * 1.02))) || 
+                        feature.properties.HASC_2 == selected.properties.HASC_2;
+            }}).addTo(mymap);
+            mymap.fitBounds(search.getBounds());
+        });
+    }
 });
 
 //onclick checkboxes makes sliders appear and disappear
@@ -112,3 +144,4 @@ function updateSliderValue(element, value) {
     values[element] = value
 
 }
+
