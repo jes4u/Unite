@@ -91,6 +91,8 @@ function activateSlider(element) {
     //console.log(element);
     let checkboxEle = document.getElementById(element + "ID");
     let sliderEle = document.getElementById(element + "SliderID");
+    let searchbox = document.getElementById("controlbox");
+    let panelHeaderTitle = document.getElementById("panel-header-title");
     if( checkboxEle.checked == true ) {
         sliderEle.parentElement.parentElement.parentElement.style.display = "block";
     } else {
