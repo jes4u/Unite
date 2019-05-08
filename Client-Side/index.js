@@ -123,6 +123,10 @@ $(document).ready(function() {
     }
 });
 
+function addPopup(feature, layer){
+  layer.bindPopup(feature.properties.NAME_0);
+}
+
 //onclick checkboxes makes sliders appear and disappear
 function activateSlider(element) {
     //console.log(element);
