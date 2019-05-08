@@ -1,3 +1,5 @@
+//Editors: Jesse Tran
+
 'use strict';
 
 var values = {
@@ -42,7 +44,7 @@ $(document).ready(function() {
 
     var searchboxControl=createSearchboxControl();
     var control = new searchboxControl({
-        sidebarTitleText: 'Header',
+        sidebarTitleText: "",
         sidebarMenuItems: {
             Items: [
                 { 
@@ -84,8 +86,9 @@ $(document).ready(function() {
     
 });
 
+//onclick checkboxes makes sliders appear and disappear
 function activateSlider(element) {
-    console.log(element);
+    //console.log(element);
     let checkboxEle = document.getElementById(element + "ID");
     let sliderEle = document.getElementById(element + "SliderID");
     if( checkboxEle.checked == true ) {
@@ -96,11 +99,9 @@ function activateSlider(element) {
     
 }
 
-//implement way to show value changing
-
 //store values when submit button
 function updateSliderValue(element, value) {
-    console.log(element + " has value " + value);
+    //console.log(element + " has value " + value);
     values[element] = value
 
 }
