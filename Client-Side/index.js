@@ -41,12 +41,6 @@ $(document).ready(function() {
 
     mymap.zoomControl.setPosition('bottomright');
 
-    //popup proto
-    $.getJSON("sample.geojson", function(data) {
-      var dataLayer = L.geoJson(data).addTo(mymap);
-      console.log("here");
-    });
-
     var searchboxControl=createSearchboxControl();
     var control = new searchboxControl({
         sidebarTitleText: "",
@@ -97,15 +91,38 @@ $(document).ready(function() {
                 search.clearLayers();
             }
             var selected;
+            var content;
             search = L.geoJson(data, {filter: function(feature) {
                 selected = feature;
                 if (feature.properties.NAME_2 == null) {
                     return false;
                 }
-                return feature.properties.NAME_2.toLowerCase() == input.toLowerCase();
-            }}).addTo(mymap).on('click', function() {useLocation(selected);});
-            mymap.fitBounds(search.getBounds());
+                if(feature.properties.NAME_2.toLowerCase() == input.toLowerCase()){
+                    content = popupContent(feature);
+                    return true;
+                }
+                return false;
+            }}).bindPopup(content).addTo(mymap);
         });
+    }
+
+    function popupContent(feature) {
+      var content = document.createElement("div");
+      var country = document.createElement("p");
+      country.innerHTML = "Country: " + feature.properties.NAME_0;
+      var city = document.createElement("p");
+      city.innerHTML = "City/Province: " + feature.properties.NAME_1;
+      var county = document.createElement("p");
+      county.innerHTML = "County: " + feature.properties.NAME_2;
+      var link = document.createElement("a");
+      link.href = "http://www.google.com/search?q=" + feature.properties.NAME_0 + "+" + feature.properties.NAME_1 + "+" + feature.properties.NAME_2;
+      link.innerHTML = "Search for more information!";
+      content.appendChild(country);
+      content.appendChild(city);
+      content.appendChild(county);
+      content.appendChild(link);
+      console.log(content.childNodes);
+      return content;
     }
 
     function useLocation(selected) {
