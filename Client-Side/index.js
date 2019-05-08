@@ -43,7 +43,7 @@ $(document).ready(function() {
 
     //popup proto
     $.getJSON("sample.geojson", function(data) {
-      var dataLayer = L.geoJson(data, {onEachFeature: addPopup}).addTo(mymap);
+      var dataLayer = L.geoJson(data).addTo(mymap);
       console.log("here");
     });
 
@@ -84,7 +84,7 @@ $(document).ready(function() {
         if (!searchkeywords) {
             searchkeywords = "The search call back is clicked !!"
         }
-        
+
         onClickSearch(searchkeywords)
     }
     mymap.addControl(control);
@@ -114,8 +114,8 @@ $(document).ready(function() {
                 search.clearLayers();
             }
             search = L.geoJson(data, {filter: function(feature) {
-                return ((feature.properties.POPULATION > (selected.properties.POPULATION * 0.99) && 
-                        feature.properties.POPULATION < (selected.properties.POPULATION * 1.02))) || 
+                return ((feature.properties.POPULATION > (selected.properties.POPULATION * 0.99) &&
+                        feature.properties.POPULATION < (selected.properties.POPULATION * 1.02))) ||
                         feature.properties.HASC_2 == selected.properties.HASC_2;
             }}).addTo(mymap);
             mymap.fitBounds(search.getBounds());
@@ -151,5 +151,5 @@ function updateSliderValue(element, value) {
 
 function submitValues() {
     console.log(values);
-    // Run geojson query 
+    // Run geojson query
 }
