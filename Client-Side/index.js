@@ -1,5 +1,27 @@
+//Editors: Jesse Tran
+
 'use strict';
 
+var values = {
+    population: 0,
+    gdp: 0,
+    carbon: 0
+};
+
+var sliderValues = {
+    population : {
+        min: 0,
+        max: 100
+    },
+    gdp : {
+        min: 1,
+        max: 101
+    },
+    carbon : {
+        min: 2,
+        max: 102
+    }
+}
 
 $(document).ready(function() {
 
@@ -27,19 +49,33 @@ $(document).ready(function() {
 
     var searchboxControl=createSearchboxControl();
     var control = new searchboxControl({
-        sidebarTitleText: 'Header',
+        sidebarTitleText: "",
         sidebarMenuItems: {
             Items: [
                 {
                     type: "checkbox",
                     name: "GDP",
-                    onclick: "createGDP();"
+                    value: "gdp",
+                    onclick: "activateSlider('gdp');",
+                    min: sliderValues.gdp.min,
+                    max: sliderValues.gdp.max
+                },
+                {
+                    type: "checkbox",
+                    name: "Population",
+                    value: "population",
+                    onclick: "activateSlider('population');",
+                    min: sliderValues.population.min,
+                    max: sliderValues.population.max
+                },
+                {
+                    type: "checkbox",
+                    name: "Carbon Emissions",
+                    value: "carbon",
+                    onclick: "activateSlider('carbon');" ,
+                    min: sliderValues.carbon.min,
+                    max: sliderValues.carbon.max
                 }
-                ,{ type: "link", name: "Link 1 (github.com)", href: "http://github.com", icon: "icon-local-carwash" }
-                // { type: "link", name: "Link 2 (google.com)", href: "http://google.com", icon: "icon-cloudy" },
-                // { type: "button", name: "Button 1", onclick: "alert('button 1 clicked !')", icon: "icon-potrait" },
-                // { type: "button", name: "Button 2", onclick: "button2_click();", icon: "icon-local-dining" },
-                // { type: "link", name: "Link 3 (stackoverflow.com)", href: 'http://stackoverflow.com', icon: "icon-bike" },
             ]
         }
     });
@@ -55,39 +91,24 @@ $(document).ready(function() {
 
 });
 
-function addPopup(feature, layer) {
-  layer.bindPopup(popupContent(feature));
+//onclick checkboxes makes sliders appear and disappear
+function activateSlider(element) {
+    //console.log(element);
+    let checkboxEle = document.getElementById(element + "ID");
+    let sliderEle = document.getElementById(element + "SliderID");
+    let searchbox = document.getElementById("controlbox");
+    let panelHeaderTitle = document.getElementById("panel-header-title");
+    if( checkboxEle.checked == true ) {
+        sliderEle.parentElement.parentElement.parentElement.style.display = "block";
+    } else {
+        sliderEle.parentElement.parentElement.parentElement.style.display = "none";
+    }
+
 }
 
-function popupContent(feature) {
-  var content = document.createElement("div");
-  content.style.float = "left";
-  var country = document.createElement("p");
-  country.innerHTML = "Country: " + feature.properties.NAME_0;
-  var city = document.createElement("p");
-  city.innerHTML = "City/Province: " + feature.properties.NAME_1;
-  var county = document.createElement("p");
-  county.innerHTML = "County: " + feature.properties.NAME_2;
-  var link = document.createElement("a");
-  link.title = "link title";
-  link.href = "www.google.com/" + feature.properties.NAME_0 + " " + feature.properties.NAME_1 + " " + feature.properties.NAME_2 + " population";
-  content.appendChild(country);
-  content.appendChild(city);
-  content.appendChild(county);
-  content.appendChild(link);
-  return content;
-}
-
-function button2_click(){
-    alert('button 2 clicked !!!');
-}
-function createGDP() {
-    alert('hi');
-    let gdpDiv = document.createElement("div");
-    let gdpSlider = document.createElement("input");
-    gdpSlider.setAttribute("type", "range");
-    gdpSlider.setAttribute("max", "5");
-    gdpSlider.setAttribute("min", "0");
-    gdpDiv.appendChild(gdpSlider);
+//store values when submit button
+function updateSliderValue(element, value) {
+    //console.log(element + " has value " + value);
+    values[element] = value
 
 }
