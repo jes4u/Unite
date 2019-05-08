@@ -15,6 +15,18 @@
     transition-timing-function:cubic-bezier(0,0,.2,1)
 }
 
+#controlboxInner{
+    left:0;
+    margin-left:16px;
+    top:0;
+    transition:left .5s;
+    -webkit-transform:translateX(0);
+    transform:translateX(0);
+    transition-property:-webkit-transform,transform,visibility,opacity;
+    transition-duration:.2s;
+    transition-timing-function:cubic-bezier(0,0,.2,1)
+}
+
 #controlcontainer{
     top:0;
     position:absolute;
@@ -107,7 +119,12 @@ a,button,h1,h2,h3,h4,h5,h6,input,ol,p,textarea,th,ul{
 }
 
 .panel{
-    width:300px;float:left;height:550px;background:#fff;position:relative;display:none
+    width:408px;
+    float:left;
+    height:550px;
+    background:#fff;
+    position:relative;
+    display:none
 }
 
 .panel-header{
@@ -119,7 +136,15 @@ a,button,h1,h2,h3,h4,h5,h6,input,ol,p,textarea,th,ul{
 }
 
 .panel-header-title{
-    display:table-cell;font-weight:600;font-size:20px;text-align:center;width:95%;line-height:24px;padding-top:10px;padding-bottom:10px;color:#c3c3c3
+    display:table-cell;
+    /* font-weight:600;
+    font-size:20px;
+    text-align:center; */
+    width:95%;
+    line-height:24px;
+    padding-top:10px;
+    padding-bottom:10px;
+    color:#c3c3c3
 }
 
 .panel-close-button{
