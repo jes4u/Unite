@@ -1,4 +1,4 @@
-//Editors: Jesse Tran
+//Editors: Jesse Tran, Stone Kaech, Jeewon Ha
 
 'use strict';
 
@@ -14,14 +14,18 @@ var sliderValues = {
         max: 100
     },
     gdp : {
-        min: 1,
-        max: 101
+        min: 0,
+        max: 100
     },
     carbon : {
         min: 2,
-        max: 102
+        max: 100
     }
 }
+
+var selectedFeature;
+var search;
+var mymap;
 
 $(document).ready(function() {
 
@@ -29,7 +33,7 @@ $(document).ready(function() {
     $("#mapid").height($(window).height()).width($(window).width());
 
 
-    var mymap = L.map('mapid').setView([51.505, -0.09], 2);
+    mymap = L.map('mapid').setView([51.505, -0.09], 2);
 
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -89,38 +93,35 @@ $(document).ready(function() {
     }
     mymap.addControl(control);
 
-    var search;
+    var selected;
     function onClickSearch(input) {
         //var input = document.getElementById('searchbox').value;
         $.getJSON("../citydatatest.geojson", function(data){
             if (typeof search != "undefined") {
                 search.clearLayers();
             }
-            var selected;
+            //var selected;
             search = L.geoJson(data, {filter: function(feature) {
                 selected = feature;
                 if (feature.properties.NAME_2 == null) {
                     return false;
                 }
                 return feature.properties.NAME_2.toLowerCase() == input.toLowerCase();
-            }}).addTo(mymap).on('click', function() {useLocation(selected);});
+            }}).addTo(mymap).on('click', function() {submitValues(selected);});
             mymap.fitBounds(search.getBounds());
+            selectedFeature = selected
         });
+
     }
 
-    function useLocation(selected) {
-        $.getJSON("../citydatatest.geojson", function(data){
-            if (typeof search != "undefined") {
-                search.clearLayers();
-            }
-            search = L.geoJson(data, {filter: function(feature) {
-                return ((feature.properties.POPULATION > (selected.properties.POPULATION * 0.99) && 
-                        feature.properties.POPULATION < (selected.properties.POPULATION * 1.02))) || 
-                        feature.properties.HASC_2 == selected.properties.HASC_2;
-            }}).addTo(mymap);
-            mymap.fitBounds(search.getBounds());
-        });
-    }
+    function submitValues(selected) {
+        console.log(values);
+        
+    }    
+
+
+
+
 });
 
 function addPopup(feature, layer){
@@ -149,7 +150,19 @@ function updateSliderValue(element, value) {
 
 }
 
-function submitValues() {
-    console.log(values);
-    // Run geojson query 
+//Old name: useLocation
+function searchPopulationPercent() {
+    var popValPercent = values.population / 100;
+    console.log(popValPercent)
+    $.getJSON("../citydatatest.geojson", function(data){
+        if (typeof search != "undefined") {
+            search.clearLayers();
+        }
+        search = L.geoJson(data, {filter: function(feature) {
+            return ((feature.properties.POPULATION > (selectedFeature.properties.POPULATION * (1.0 - popValPercent)) && 
+                    feature.properties.POPULATION < (selectedFeature.properties.POPULATION * (1.0 + popValPercent)))) || 
+                    feature.properties.HASC_2 == selectedFeature.properties.HASC_2;
+        }}).addTo(mymap);
+        mymap.fitBounds(search.getBounds());
+    });
 }
