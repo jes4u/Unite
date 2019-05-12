@@ -45,12 +45,6 @@ $(document).ready(function() {
 
     mymap.zoomControl.setPosition('bottomright');
 
-    //popup proto
-    $.getJSON("sample.geojson", function(data) {
-      var dataLayer = L.geoJson(data, {onEachFeature: addPopup}).addTo(mymap);
-      console.log("here");
-    });
-
     var searchboxControl=createSearchboxControl();
     var control = new searchboxControl({
         sidebarTitleText: "",
@@ -88,7 +82,7 @@ $(document).ready(function() {
         if (!searchkeywords) {
             searchkeywords = "The search call back is clicked !!"
         }
-        
+
         onClickSearch(searchkeywords)
     }
     mymap.addControl(control);
@@ -101,23 +95,60 @@ $(document).ready(function() {
                 search.clearLayers();
             }
             //var selected;
+            var content;
             search = L.geoJson(data, {filter: function(feature) {
                 selected = feature;
                 if (feature.properties.NAME_2 == null) {
                     return false;
                 }
-                return feature.properties.NAME_2.toLowerCase() == input.toLowerCase();
-            }}).addTo(mymap).on('click', function() {submitValues(selected);});
-            mymap.fitBounds(search.getBounds());
+                if(feature.properties.NAME_2.toLowerCase() == input.toLowerCase()){
+                    content = popupContent(feature);
+                    return true;
+                }
+                return false;
+            }}).bindPopup(content).addTo(mymap);
+            mymap.fitBounds(search.getBounds())
             selectedFeature = selected
         });
-
     }
 
-    function submitValues(selected) {
-        console.log(values);
+    function popupContent(feature) {
+      var content = document.createElement("div");
+      var country = document.createElement("p");
+      country.innerHTML = "Country: " + feature.properties.NAME_0;
+      var city = document.createElement("p");
+      city.innerHTML = "City/Province: " + feature.properties.NAME_1;
+      var county = document.createElement("p");
+      county.innerHTML = "County: " + feature.properties.NAME_2;
+      var link = document.createElement("a");
+      link.href = "http://www.google.com/search?q=" + feature.properties.NAME_0 + "+" + feature.properties.NAME_1 + "+" + feature.properties.NAME_2;
+      link.innerHTML = "Search for more information!";
+      content.appendChild(country);
+      content.appendChild(city);
+      content.appendChild(county);
+      content.appendChild(link);
+      console.log(content.childNodes);
+      return content;
+    }
+
+    // function useLocation(selected) {
+    //     $.getJSON("../citydatatest.geojson", function(data){
+    //         if (typeof search != "undefined") {
+    //             search.clearLayers();
+    //         }
+    //         search = L.geoJson(data, {filter: function(feature) {
+    //             return ((feature.properties.POPULATION > (selected.properties.POPULATION * 0.99) &&
+    //                     feature.properties.POPULATION < (selected.properties.POPULATION * 1.02))) ||
+    //                     feature.properties.HASC_2 == selected.properties.HASC_2;
+    //         }}).addTo(mymap);
+    //         mymap.fitBounds(search.getBounds());
+    //     });
+    // }
+
+    // function submitValues(selected) {
+    //     console.log(values);
         
-    }    
+    // }    
 
 
 
