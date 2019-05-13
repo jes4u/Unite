@@ -126,12 +126,17 @@ function popupContent(feature) {
     city.innerHTML = "City/Province: " + feature.properties.NAME_1;
     var county = document.createElement("p");
     county.innerHTML = "County: " + feature.properties.NAME_2;
+
+    var population = document.createElement("p");
+    population.innerHTML = "Population: " + feature.properties.POPULATION;
+
     var link = document.createElement("a");
     link.href = "http://www.google.com/search?q=" + feature.properties.NAME_0 + "+" + feature.properties.NAME_1 + "+" + feature.properties.NAME_2;
     link.innerHTML = "Search for more information!";
     content.appendChild(country);
     content.appendChild(city);
     content.appendChild(county);
+    content.appendChild(population);
     content.appendChild(link);
     console.log(content.childNodes);
     return content;
