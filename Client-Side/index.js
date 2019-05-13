@@ -87,70 +87,7 @@ $(document).ready(function() {
     }
     mymap.addControl(control);
 
-    var selected;
-    function onClickSearch(input) {
-        //var input = document.getElementById('searchbox').value;
-        $.getJSON("../citydatatest.geojson", function(data){
-            if (typeof search != "undefined") {
-                search.clearLayers();
-            }
-            //var selected;
-            var content;
-            search = L.geoJson(data, {filter: function(feature) {
-                selected = feature;
-                if (feature.properties.NAME_2 == null) {
-                    return false;
-                }
-                if(feature.properties.NAME_2.toLowerCase() == input.toLowerCase()){
-                    content = popupContent(feature);
-                    return true;
-                }
-                return false;
-            }}).bindPopup(content).addTo(mymap);
-            mymap.fitBounds(search.getBounds())
-            selectedFeature = selected
-        });
-    }
-
-    function popupContent(feature) {
-      var content = document.createElement("div");
-      var country = document.createElement("p");
-      country.innerHTML = "Country: " + feature.properties.NAME_0;
-      var city = document.createElement("p");
-      city.innerHTML = "City/Province: " + feature.properties.NAME_1;
-      var county = document.createElement("p");
-      county.innerHTML = "County: " + feature.properties.NAME_2;
-      var link = document.createElement("a");
-      link.href = "http://www.google.com/search?q=" + feature.properties.NAME_0 + "+" + feature.properties.NAME_1 + "+" + feature.properties.NAME_2;
-      link.innerHTML = "Search for more information!";
-      content.appendChild(country);
-      content.appendChild(city);
-      content.appendChild(county);
-      content.appendChild(link);
-      console.log(content.childNodes);
-      return content;
-    }
-
-    // function useLocation(selected) {
-    //     $.getJSON("../citydatatest.geojson", function(data){
-    //         if (typeof search != "undefined") {
-    //             search.clearLayers();
-    //         }
-    //         search = L.geoJson(data, {filter: function(feature) {
-    //             return ((feature.properties.POPULATION > (selected.properties.POPULATION * 0.99) &&
-    //                     feature.properties.POPULATION < (selected.properties.POPULATION * 1.02))) ||
-    //                     feature.properties.HASC_2 == selected.properties.HASC_2;
-    //         }}).addTo(mymap);
-    //         mymap.fitBounds(search.getBounds());
-    //     });
-    // }
-
-    // function submitValues(selected) {
-    //     console.log(values);
-        
-    // }    
-
-
+   
 
 
 });
@@ -181,8 +118,51 @@ function updateSliderValue(element, value) {
 
 }
 
+function popupContent(feature) {
+    var content = document.createElement("div");
+    var country = document.createElement("p");
+    country.innerHTML = "Country: " + feature.properties.NAME_0;
+    var city = document.createElement("p");
+    city.innerHTML = "City/Province: " + feature.properties.NAME_1;
+    var county = document.createElement("p");
+    county.innerHTML = "County: " + feature.properties.NAME_2;
+    var link = document.createElement("a");
+    link.href = "http://www.google.com/search?q=" + feature.properties.NAME_0 + "+" + feature.properties.NAME_1 + "+" + feature.properties.NAME_2;
+    link.innerHTML = "Search for more information!";
+    content.appendChild(country);
+    content.appendChild(city);
+    content.appendChild(county);
+    content.appendChild(link);
+    console.log(content.childNodes);
+    return content;
+  }
+
+function onClickSearch(input) {
+    //var input = document.getElementById('searchbox').value;
+    $.getJSON("../citydatatest.geojson", function(data){
+        if (typeof search != "undefined") {
+            search.clearLayers();
+        }
+        var content;
+        search = L.geoJson(data, {filter: function(feature) {
+            selectedFeature = feature;
+            if (feature.properties.NAME_2 == null) {
+                return false;
+            }
+            if(feature.properties.NAME_2.toString().toLowerCase() == input.toString().toLowerCase()){
+                content = popupContent(feature);
+                return true;
+            }
+            return false;
+        }}).bindPopup(content).addTo(mymap);
+        mymap.fitBounds(search.getBounds())
+    });
+}
+
 //Old name: useLocation
 function searchPopulationPercent() {
+    var input = $("#searchboxinput").val
+    onClickSearch(input);
     var popValPercent = values.population / 100;
     console.log(popValPercent)
     $.getJSON("../citydatatest.geojson", function(data){
