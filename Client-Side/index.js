@@ -11,15 +11,15 @@ var values = {
 var sliderValues = {
     population : {
         min: 0,
-        max: 100
+        max: 20
     },
     gdp : {
         min: 0,
-        max: 100
+        max: 20
     },
     carbon : {
-        min: 2,
-        max: 100
+        min: 0,
+        max: 20
     }
 }
 
@@ -115,7 +115,8 @@ function activateSlider(element) {
 function updateSliderValue(element, value) {
     //console.log(element + " has value " + value);
     values[element] = value
-
+    let valEle= "value" + element;
+    document.getElementById(valEle).innerHTML = "Value: " + value;
 }
 
 function popupContent(feature) {
@@ -126,9 +127,14 @@ function popupContent(feature) {
     city.innerHTML = "City/Province: " + feature.properties.NAME_1;
     var county = document.createElement("p");
     county.innerHTML = "County: " + feature.properties.NAME_2;
-
     var population = document.createElement("p");
     population.innerHTML = "Population: " + feature.properties.POPULATION;
+    var popDensity = document.createElement("p");
+    population.innerHTML = "Population Density: " + feature.properties.POPDENSITY;
+    var carbon = document.createElement("p");
+    population.innerHTML = "Carbon Emission Level: " + feature.properties.CARBON;
+    var perCapCarbon = document.createElement("p");
+    population.innerHTML = "Carbon Emission per Capita: " + feature.properties.PERCAPCARB;
 
     var link = document.createElement("a");
     link.href = "http://www.google.com/search?q=" + feature.properties.NAME_0 + "+" + feature.properties.NAME_1 + "+" + feature.properties.NAME_2;
@@ -138,7 +144,7 @@ function popupContent(feature) {
     content.appendChild(county);
     content.appendChild(population);
     content.appendChild(link);
-    console.log(content.childNodes);
+    //console.log(content.childNodes);
     return content;
   }
 
@@ -166,6 +172,7 @@ function onClickSearch(input) {
 
 //Old name: useLocation
 function searchPopulationPercent() {
+    console.log(values)
     var input = $("#searchboxinput").val
     onClickSearch(input);
     var popValPercent = values.population / 100;
