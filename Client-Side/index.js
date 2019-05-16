@@ -26,6 +26,7 @@ var sliderValues = {
 var selectedFeature;
 var search;
 var mymap;
+var currentSelcted;
 
 $(document).ready(function() {
 
@@ -130,11 +131,11 @@ function popupContent(feature) {
     var population = document.createElement("p");
     population.innerHTML = "Population: " + feature.properties.POPULATION;
     var popDensity = document.createElement("p");
-    population.innerHTML = "Population Density: " + feature.properties.POPDENSITY;
+    popDensity.innerHTML = "Population Density: " + feature.properties.POPDENSITY;
     var carbon = document.createElement("p");
-    population.innerHTML = "Carbon Emission Level: " + feature.properties.CARBON;
+    carbon.innerHTML = "Carbon Emission Level: " + feature.properties.CARBON;
     var perCapCarbon = document.createElement("p");
-    population.innerHTML = "Carbon Emission per Capita: " + feature.properties.PERCAPCARB;
+    perCapCarbon.innerHTML = "Carbon Emission per Capita: " + feature.properties.PERCAPCARB;
 
     var link = document.createElement("a");
     link.href = "http://www.google.com/search?q=" + feature.properties.NAME_0 + "+" + feature.properties.NAME_1 + "+" + feature.properties.NAME_2;
@@ -143,8 +144,14 @@ function popupContent(feature) {
     content.appendChild(city);
     content.appendChild(county);
     content.appendChild(population);
+    content.appendChild(popDensity);
+    content.appendChild(carbon);
+    content.appendChild(perCapCarbon);
     content.appendChild(link);
     //console.log(content.childNodes);
+
+    currentSelcted = feature;
+
     return content;
   }
 
@@ -162,12 +169,21 @@ function onClickSearch(input) {
             }
             if(feature.properties.NAME_2.toString().toLowerCase() == input.toString().toLowerCase()){
                 content = popupContent(feature);
+
+                var dropDown = document.getElementById("dropDown");
+                var option = document.createElement("option");
+                option.value = '"' + feature.properties.GID_2 + '"';
+                option.innerHTML = feature.properties.NAME_2 + " County " + feature.properties.NAME_1 + ", " + feature.properties.NAME_0;
+                dropDown.appendChild(option);
+                
+                //console.log(feature)
                 return true;
             }
             return false;
         }}).bindPopup(content).addTo(mymap);
         mymap.fitBounds(search.getBounds())
     });
+    //console.log(selectedFeature)
 }
 
 //Old name: useLocation
