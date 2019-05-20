@@ -157,48 +157,35 @@ function popupContent(feature) {
   }
 
 function onClickSearch(input) {
-    //var input = document.getElementById('searchbox').value;
     $.getJSON('./Data/GeoJSONFiles/countypoint.geojson', function(data){
         if (typeof search != "undefined") {
             search.clearLayers();
         }
-        var content;
         search = L.geoJson(data, {filter: function(feature) {
             selectedFeature = feature;
             if (feature.properties.NAME_2 == null) {
                 return false;
             }
             if(feature.properties.NAME_2.toString().toLowerCase() == input.toString().toLowerCase()){
-                content = popupContent(feature);
-
-                var dropDown = document.getElementById("dropDown");
-                var option = document.createElement("option");
-                option.value = '"' + feature.properties.GID_2 + '"';
-                option.innerHTML = feature.properties.NAME_2 + " County " + feature.properties.NAME_1 + ", " + feature.properties.NAME_0;
-                dropDown.appendChild(option);
-                
-                //console.log(feature)
-                L.geoJson(feature).bindPopup(content).addTo(mymap);
-
+                addMarkerActions(feature);
                 return true;
+
             }
             return false;
         }}) 
-        console.log(search);
         mymap.fitBounds(search.getBounds())
     });
 }
 
 //Old name: useLocation
 function searchPopulationPercent() {
-    //console.log(values)
     var input = $("#searchboxinput").val
     onClickSearch(input);
     var popValPercent = values.population / 100;
     var carbonValPercent = values.carbon / 100;
     var gdpValPercent = values.gdp / 100;
     $.getJSON('./Data/GeoJSONFiles/countypoint.geojson', function(data){
-        var content;
+        //var content;
         if (typeof search != "undefined") {
             search.clearLayers();
         }
@@ -208,13 +195,29 @@ function searchPopulationPercent() {
                 feature.properties.POPULATION < (selectedFeature.properties.POPULATION * (1.0 + popValPercent)))) || 
                 feature.properties.HASC_2 == selectedFeature.properties.HASC_2) 
             {
-                content = popupContent(feature);
-                L.geoJson(feature).bindPopup(content).addTo(mymap);
+
+                addMarkerActions(feature);
                 return true;
+
             } else {
                 return false;
             }
         }})
         mymap.fitBounds(search.getBounds())
+    });
+}
+
+function addMarkerActions(feature) {
+    var content = popupContent(feature);
+    var dropDown = document.getElementById("dropDown");
+    var option = document.createElement("option");
+    option.value = '"' + feature.properties.GID_2 + '"';
+    dropDownOptions.push(feature.properties.GID_2 + "");
+
+    option.innerHTML = feature.properties.NAME_2 + " County " + feature.properties.NAME_1 + ", " + feature.properties.NAME_0;
+    dropDown.appendChild(option);
+    var marker = L.geoJson(feature).bindPopup(content).addTo(mymap);
+    marker.on("click", function(event) { 
+        document.getElementById("dropDown").selectedIndex = dropDownOptions.indexOf(event.layer.feature.properties.GID_2 + "");
     });
 }
