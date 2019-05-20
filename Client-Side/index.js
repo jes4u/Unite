@@ -177,10 +177,13 @@ function onClickSearch(input) {
                 dropDown.appendChild(option);
                 
                 //console.log(feature)
+                L.geoJson(feature).bindPopup(content).addTo(mymap);
+
                 return true;
             }
             return false;
-        }}).bindPopup(content).addTo(mymap);
+            //need to apply bindpopup to every feature in true
+        }}) 
         mymap.fitBounds(search.getBounds())
     });
     //console.log(selectedFeature)
@@ -192,14 +195,16 @@ function searchPopulationPercent() {
     var input = $("#searchboxinput").val
     onClickSearch(input);
     var popValPercent = values.population / 100;
-    console.log(popValPercent)
+    var carbonValPercent = values.carbon / 100;
+    var gdpValPercent = values.gdp / 100;
     $.getJSON("../citydatatest.geojson", function(data){
         if (typeof search != "undefined") {
             search.clearLayers();
         }
         search = L.geoJson(data, {filter: function(feature) {
             return ((feature.properties.POPULATION > (selectedFeature.properties.POPULATION * (1.0 - popValPercent)) && 
-                    feature.properties.POPULATION < (selectedFeature.properties.POPULATION * (1.0 + popValPercent)))) || 
+                    feature.properties.POPULATION < (selectedFeature.properties.POPULATION * (1.0 + popValPercent)))
+                    ) || 
                     feature.properties.HASC_2 == selectedFeature.properties.HASC_2;
         }}).addTo(mymap);
         mymap.fitBounds(search.getBounds());
