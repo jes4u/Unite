@@ -24,7 +24,7 @@ var sliderValues = {
 }
 
 var selectedFeature;
-var search;
+//var search;
 var mymap;
 var currentSelcted;
 
@@ -157,6 +157,7 @@ function popupContent(feature) {
 
 function onClickSearch(input) {
     //var input = document.getElementById('searchbox').value;
+    var search;
     $.getJSON("/Data/GeoJSONFiles/countypoint.geojson", function(data){
         if (typeof search != "undefined") {
             search.clearLayers();
@@ -182,31 +183,39 @@ function onClickSearch(input) {
                 return true;
             }
             return false;
-            //need to apply bindpopup to every feature in true
         }}) 
+        console.log(search);
         mymap.fitBounds(search.getBounds())
     });
-    //console.log(selectedFeature)
 }
 
 //Old name: useLocation
 function searchPopulationPercent() {
-    console.log(values)
+    //console.log(values)
+    var search;
     var input = $("#searchboxinput").val
     onClickSearch(input);
     var popValPercent = values.population / 100;
     var carbonValPercent = values.carbon / 100;
     var gdpValPercent = values.gdp / 100;
     $.getJSON("/Data/GeoJSONFiles/countypoint.geojson", function(data){
+        var content;
         if (typeof search != "undefined") {
             search.clearLayers();
         }
         search = L.geoJson(data, {filter: function(feature) {
-            return ((feature.properties.POPULATION > (selectedFeature.properties.POPULATION * (1.0 - popValPercent)) && 
-                    feature.properties.POPULATION < (selectedFeature.properties.POPULATION * (1.0 + popValPercent)))
-                    ) || 
-                    feature.properties.HASC_2 == selectedFeature.properties.HASC_2;
-        }}).addTo(mymap);
-        mymap.fitBounds(search.getBounds());
+            
+            if (((feature.properties.POPULATION > (selectedFeature.properties.POPULATION * (1.0 - popValPercent)) && 
+                feature.properties.POPULATION < (selectedFeature.properties.POPULATION * (1.0 + popValPercent)))) || 
+                feature.properties.HASC_2 == selectedFeature.properties.HASC_2) 
+            {
+                content = popupContent(feature);
+                L.geoJson(feature).bindPopup(content).addTo(mymap);
+                return true;
+            } else {
+                return false;
+            }
+        }})
+        mymap.fitBounds(search.getBounds())
     });
 }
