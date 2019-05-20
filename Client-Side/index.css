@@ -10,7 +10,7 @@ body {
 .nav b {
     text-decoration: none;
     color: black;
-    font-size: 26px;
+    font-size: 25px;
     display: block;
     padding: 0;
     transition: .3s background-color;
