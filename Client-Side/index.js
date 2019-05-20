@@ -24,9 +24,10 @@ var sliderValues = {
 }
 
 var selectedFeature;
-//var search;
+var search;
 var mymap;
 var currentSelcted;
+var dropDownOptions = [];
 
 $(document).ready(function() {
 
@@ -157,8 +158,7 @@ function popupContent(feature) {
 
 function onClickSearch(input) {
     //var input = document.getElementById('searchbox').value;
-    var search;
-    $.getJSON("/Data/GeoJSONFiles/countypoint.geojson", function(data){
+    $.getJSON("./Data/GeoJSONFiles/countypoint.geojson", function(data){
         if (typeof search != "undefined") {
             search.clearLayers();
         }
@@ -192,13 +192,12 @@ function onClickSearch(input) {
 //Old name: useLocation
 function searchPopulationPercent() {
     //console.log(values)
-    var search;
     var input = $("#searchboxinput").val
     onClickSearch(input);
     var popValPercent = values.population / 100;
     var carbonValPercent = values.carbon / 100;
     var gdpValPercent = values.gdp / 100;
-    $.getJSON("/Data/GeoJSONFiles/countypoint.geojson", function(data){
+    $.getJSON("./Data/GeoJSONFiles/countypoint.geojson", function(data){
         var content;
         if (typeof search != "undefined") {
             search.clearLayers();
