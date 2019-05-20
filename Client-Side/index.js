@@ -157,7 +157,7 @@ function popupContent(feature) {
 
 function onClickSearch(input) {
     //var input = document.getElementById('searchbox').value;
-    $.getJSON("../citydatatest.geojson", function(data){
+    $.getJSON("/Data/GeoJSONFiles/countypoint.geojson", function(data){
         if (typeof search != "undefined") {
             search.clearLayers();
         }
@@ -197,7 +197,7 @@ function searchPopulationPercent() {
     var popValPercent = values.population / 100;
     var carbonValPercent = values.carbon / 100;
     var gdpValPercent = values.gdp / 100;
-    $.getJSON("../citydatatest.geojson", function(data){
+    $.getJSON("/Data/GeoJSONFiles/countypoint.geojson", function(data){
         if (typeof search != "undefined") {
             search.clearLayers();
         }
