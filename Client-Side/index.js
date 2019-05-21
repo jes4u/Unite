@@ -23,11 +23,10 @@ var sliderValues = {
     }
 }
 
-var selectedFeature;
-var search;
 var mymap;
-var currentSelcted;
 var dropDownOptions = [];
+var markerObject = {};
+var markerLayer;
 
 $(document).ready(function() {
 
@@ -88,19 +87,14 @@ $(document).ready(function() {
         onClickSearch(searchkeywords)
     }
     mymap.addControl(control);
-
-   
-
-
+    markerLayer = L.layerGroup().addTo(mymap);
 });
 
 function addPopup(feature, layer){
   layer.bindPopup(feature.properties.NAME_0);
 }
 
-//onclick checkboxes makes sliders appear and disappear
 function activateSlider(element) {
-    //console.log(element);
     let checkboxEle = document.getElementById(element + "ID");
     let sliderEle = document.getElementById(element + "SliderID");
     let searchbox = document.getElementById("controlbox");
@@ -113,9 +107,7 @@ function activateSlider(element) {
 
 }
 
-//store values when submit button
 function updateSliderValue(element, value) {
-    //console.log(element + " has value " + value);
     values[element] = value
     let valEle= "value" + element;
     document.getElementById(valEle).innerHTML = "Value: " + value;
@@ -149,53 +141,62 @@ function popupContent(feature) {
     content.appendChild(carbon);
     content.appendChild(perCapCarbon);
     content.appendChild(link);
-    //console.log(content.childNodes);
-
-    currentSelcted = feature;
 
     return content;
   }
 
 function onClickSearch(input) {
     $.getJSON('./Data/GeoJSONFiles/countypoint.geojson', function(data){
-        if (typeof search != "undefined") {
-            search.clearLayers();
-        }
+        var search;
+        var foundLocation = false;
+        markerLayer.clearLayers();
+        removeLocationOptions();
+        dropDownOptions = []
         search = L.geoJson(data, {filter: function(feature) {
-            selectedFeature = feature;
             if (feature.properties.NAME_2 == null) {
                 return false;
             }
             if(feature.properties.NAME_2.toString().toLowerCase() == input.toString().toLowerCase()){
                 addMarkerActions(feature);
+                foundLocation = true;
                 return true;
-
             }
             return false;
         }}) 
-        mymap.fitBounds(search.getBounds())
+        if(foundLocation) {
+            mymap.fitBounds(search.getBounds())
+        } else {
+            alert("Location not found... replace with modal popup");
+        }
+        
     });
 }
 
-//Old name: useLocation
 function searchPopulationPercent() {
-    var input = $("#searchboxinput").val
-    onClickSearch(input);
-    var popValPercent = values.population / 100;
-    var carbonValPercent = values.carbon / 100;
-    var gdpValPercent = values.gdp / 100;
     $.getJSON('./Data/GeoJSONFiles/countypoint.geojson', function(data){
-        //var content;
-        if (typeof search != "undefined") {
-            search.clearLayers();
+        var dropDownValue = document.getElementById("dropDown").value;
+        if(dropDownValue === "") {
+            alert("Location not selected in the dropdown. Canceling search");
+            return;
         }
+        var popValPercent = values.population / 100;
+        var carbonValPercent = values.carbon / 100;
+        var gdpValPercent = values.gdp / 100;
+        var selctedPopulation = markerObject[dropDownValue]._layers[ markerObject[dropDownValue]._leaflet_id - 1 ].feature.properties.POPULATION;
+        var marker_HASC_2 = markerObject[dropDownValue]._layers[ markerObject[dropDownValue]._leaflet_id - 1 ].feature.properties.HASC_2;
+        var foundMatches = false;
+        var search;
+        
+        markerLayer.clearLayers();
+        removeLocationOptions();
+        dropDownOptions = []
         search = L.geoJson(data, {filter: function(feature) {
             
-            if (((feature.properties.POPULATION > (selectedFeature.properties.POPULATION * (1.0 - popValPercent)) && 
-                feature.properties.POPULATION < (selectedFeature.properties.POPULATION * (1.0 + popValPercent)))) || 
-                feature.properties.HASC_2 == selectedFeature.properties.HASC_2) 
+            if (((feature.properties.POPULATION > (selctedPopulation * (1.0 - popValPercent)) && 
+                feature.properties.POPULATION < (selctedPopulation * (1.0 + popValPercent)))) || 
+                feature.properties.HASC_2 == marker_HASC_2) 
             {
-
+                foundMatches = true;
                 addMarkerActions(feature);
                 return true;
 
@@ -203,7 +204,12 @@ function searchPopulationPercent() {
                 return false;
             }
         }})
-        mymap.fitBounds(search.getBounds())
+        if (foundMatches) {
+            mymap.fitBounds(search.getBounds());
+        } else {
+            alert("No matches found.... replace with modal popup");
+        }
+        
     });
 }
 
@@ -211,13 +217,20 @@ function addMarkerActions(feature) {
     var content = popupContent(feature);
     var dropDown = document.getElementById("dropDown");
     var option = document.createElement("option");
-    option.value = '"' + feature.properties.GID_2 + '"';
+    option.value = feature.properties.GID_2;
     dropDownOptions.push(feature.properties.GID_2 + "");
-
     option.innerHTML = feature.properties.NAME_2 + " County " + feature.properties.NAME_1 + ", " + feature.properties.NAME_0;
     dropDown.appendChild(option);
-    var marker = L.geoJson(feature).bindPopup(content).addTo(mymap);
+    var marker = L.geoJson(feature).bindPopup(content).addTo(markerLayer);
+    markerObject[feature.properties.GID_2] = marker
     marker.on("click", function(event) { 
         document.getElementById("dropDown").selectedIndex = dropDownOptions.indexOf(event.layer.feature.properties.GID_2 + "");
     });
+}
+
+function removeLocationOptions() {
+    var locationList = document.getElementById("dropDown");
+    for ( var i = locationList.options.length -1 ; i >= 0 ; i-- ) {
+        locationList.remove(i);
+    }
 }
