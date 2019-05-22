@@ -8,6 +8,12 @@ var values = {
     carbon: 0
 };
 
+var sliderCheck = {
+    population: false,
+    gdp: false,
+    carbon: false
+}
+
 var sliderValues = {
     population : {
         min: 0,
@@ -103,10 +109,13 @@ function activateSlider(element) {
     let sliderEle = document.getElementById(element + "SliderID");
     let searchbox = document.getElementById("controlbox");
     let panelHeaderTitle = document.getElementById("panel-header-title");
+    console.log(element)
     if( checkboxEle.checked == true ) {
         sliderEle.parentElement.parentElement.parentElement.style.display = "block";
+        sliderCheck[element] = true;
     } else {
         sliderEle.parentElement.parentElement.parentElement.style.display = "none";
+        sliderCheck[element] = false;
     }
 
 }
@@ -207,6 +216,55 @@ function searchPopulationPercent() {
         dropDownOptions = [];
 
         search = L.geoJson(data, {filter: function(feature) {
+           
+            /*
+            
+            // There only needs to be one comparision functions, they're all the same
+            // Can be shortened, make new function for the IF statements, function returns true or false
+            //  Parameters passed in is an object/array pertaining to the order of checks
+            if (sliderCheck.population) {
+                if (populationComparison(feature, selectedPopulation, popValPercent) ) {
+                    if (sliderCheck.carbon) {
+                        if (carbonComparision(feature, selectedCarbon, carbonValPercent) ) {
+                            // Another if statement for gdp
+                            // if (sliderCheck.gdp) {
+                            //     if (gdpComparison(feature, selectedGDP, gdpValPercent) ) {
+                            //         return true;
+                            //     } else {
+                            //         return false;
+                            //     }
+                            // }
+                            
+                            return true;
+                        } else {
+                            return false;
+                        }
+                        
+                    } 
+                    // Another if statement for gdp
+                    // if (sliderCheck.gdp) {
+                    //     if (gdpComparison(feature, selectedGDP, gdpValPercent) ) {
+                    //         if(sliderCheck.carbon) {
+                    //             if (carbonComparision(feature, selectedCarbon, carbonValPercent) ) {
+                    //                 return true;
+                    //             } else {
+                    //                 return false;
+                    //             }
+                    //         }
+                    //         return true;
+                    //     } else {
+                    //         return false;
+                    //     }
+                    // }
+                    
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+            */
             
             if (feature.properties.POPULATION > (selectedPopulation * (1.0 - popValPercent)) && 
                 feature.properties.POPULATION < (selectedPopulation * (1.0 + popValPercent)) &&
@@ -220,6 +278,10 @@ function searchPopulationPercent() {
             } else {
                 return false;
             }
+
+
+
+
         }})
         if (foundMatches) {
             mymap.fitBounds(search.getBounds());
@@ -228,6 +290,22 @@ function searchPopulationPercent() {
         }
         
     });
+}
+
+function populationComparison(feature, selectedPopulation, popValPercent) {
+    if (feature.properties.POPULATION > (selectedPopulation * (1.0 - popValPercent)) && 
+        feature.properties.POPULATION < (selectedPopulation * (1.0 + popValPercent))){
+        return true;
+    }
+    return false;
+}
+
+function carbonComparision(feature, selectedCarbon, carbonValPercent) {
+    if (feature.properties.CARBON > (selectedCarbon * (1.0 - carbonValPercent)) &&
+        feature.properties.CARBON < (selectedCarbon * (1.0 + carbonValPercent))) {
+        return true;
+    }
+    return false;
 }
 
 // This method adds each location found into the dropdown option and adds the location marker into the
