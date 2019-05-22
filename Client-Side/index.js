@@ -29,8 +29,7 @@ var mymap;
 var currentSelcted;
 
 $(document).ready(function() {
-
-
+    
     $("#mapid").height($(window).height()).width($(window).width());
 
 
