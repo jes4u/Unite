@@ -8,6 +8,12 @@ var values = {
     carbon: 0
 };
 
+var sliderCheck = {
+    population: false,
+    gdp: false,
+    carbon: false
+}
+
 var sliderValues = {
     population : {
         min: 0,
@@ -23,9 +29,13 @@ var sliderValues = {
     }
 }
 
+//Map object
 var mymap;
+// Array of Options tags for the dropdown/Select tag
 var dropDownOptions = [];
+// Object variabel containing the data of each marker on the map. Key is the location's GID_2, value is the marker object
 var markerObject = {};
+// Layer group for markers
 var markerLayer;
 
 $(document).ready(function() {
@@ -46,6 +56,7 @@ $(document).ready(function() {
 
     mymap.zoomControl.setPosition('bottomright');
 
+    // The variables searchboxControl and control determine the options within the filter panel
     var searchboxControl=createSearchboxControl();
     var control = new searchboxControl({
         sidebarTitleText: "",
@@ -78,8 +89,9 @@ $(document).ready(function() {
             ]
         }
     });
-    control._searchfunctionCallBack = function (searchkeywords)
-    {
+
+    // Onclick search button
+    control._searchfunctionCallBack = function (searchkeywords){
         if (!searchkeywords) {
             searchkeywords = "The search call back is clicked !!"
         }
@@ -90,29 +102,32 @@ $(document).ready(function() {
     markerLayer = L.layerGroup().addTo(mymap);
 });
 
-function addPopup(feature, layer){
-  layer.bindPopup(feature.properties.NAME_0);
-}
-
+// This method controls the display of the sliders within the filter panel. 
+//If the checkbox is checked then the slider appears, if it is not checked, the slider disappears
 function activateSlider(element) {
     let checkboxEle = document.getElementById(element + "ID");
     let sliderEle = document.getElementById(element + "SliderID");
     let searchbox = document.getElementById("controlbox");
     let panelHeaderTitle = document.getElementById("panel-header-title");
+    console.log(element)
     if( checkboxEle.checked == true ) {
         sliderEle.parentElement.parentElement.parentElement.style.display = "block";
+        sliderCheck[element] = true;
     } else {
         sliderEle.parentElement.parentElement.parentElement.style.display = "none";
+        sliderCheck[element] = false;
     }
 
 }
 
+// This method constantly updates the display for current slider value everytime the slider changes value
 function updateSliderValue(element, value) {
     values[element] = value
     let valEle= "value" + element;
     document.getElementById(valEle).innerHTML = "Value: " + value;
 }
 
+//This method displays all the texts with each marker
 function popupContent(feature) {
     var content = document.createElement("div");
     var country = document.createElement("p");
@@ -145,13 +160,16 @@ function popupContent(feature) {
     return content;
   }
 
+// This method is called after the search button is pressed, the method will search through
+//  the geoJSON file and create markers for each location that matches the results
+// If there are no results, an error will appear saying no location has been found
 function onClickSearch(input) {
     $.getJSON('./Data/GeoJSONFiles/countypoint.geojson', function(data){
         var search;
         var foundLocation = false;
         markerLayer.clearLayers();
         removeLocationOptions();
-        dropDownOptions = []
+        dropDownOptions = [];
         search = L.geoJson(data, {filter: function(feature) {
             if (feature.properties.NAME_2 == null) {
                 return false;
@@ -172,6 +190,10 @@ function onClickSearch(input) {
     });
 }
 
+// This method is called after the submit button is pressed within the filter panel
+// When called, the method will use the filtered values and search the geoJSON files for 
+//  locations that fits within the filtered range and will throw and error if there are no
+//  results found
 function searchPopulationPercent() {
     $.getJSON('./Data/GeoJSONFiles/countypoint.geojson', function(data){
         var dropDownValue = document.getElementById("dropDown").value;
@@ -182,19 +204,72 @@ function searchPopulationPercent() {
         var popValPercent = values.population / 100;
         var carbonValPercent = values.carbon / 100;
         var gdpValPercent = values.gdp / 100;
-        var selctedPopulation = markerObject[dropDownValue]._layers[ markerObject[dropDownValue]._leaflet_id - 1 ].feature.properties.POPULATION;
+        var selectedProperties = markerObject[dropDownValue]._layers[ markerObject[dropDownValue]._leaflet_id - 1 ].feature.properties
+        var selectedPopulation = selectedProperties.POPULATION;
+        var selectedCarbon = selectedProperties.CARBON;
         var marker_HASC_2 = markerObject[dropDownValue]._layers[ markerObject[dropDownValue]._leaflet_id - 1 ].feature.properties.HASC_2;
         var foundMatches = false;
         var search;
         
         markerLayer.clearLayers();
         removeLocationOptions();
-        dropDownOptions = []
+        dropDownOptions = [];
+
         search = L.geoJson(data, {filter: function(feature) {
+           
+            /*
             
-            if (((feature.properties.POPULATION > (selctedPopulation * (1.0 - popValPercent)) && 
-                feature.properties.POPULATION < (selctedPopulation * (1.0 + popValPercent)))) || 
-                feature.properties.HASC_2 == marker_HASC_2) 
+            // There only needs to be one comparision functions, they're all the same
+            // Can be shortened, make new function for the IF statements, function returns true or false
+            //  Parameters passed in is an object/array pertaining to the order of checks
+            if (sliderCheck.population) {
+                if (populationComparison(feature, selectedPopulation, popValPercent) ) {
+                    if (sliderCheck.carbon) {
+                        if (carbonComparision(feature, selectedCarbon, carbonValPercent) ) {
+                            // Another if statement for gdp
+                            // if (sliderCheck.gdp) {
+                            //     if (gdpComparison(feature, selectedGDP, gdpValPercent) ) {
+                            //         return true;
+                            //     } else {
+                            //         return false;
+                            //     }
+                            // }
+                            
+                            return true;
+                        } else {
+                            return false;
+                        }
+                        
+                    } 
+                    // Another if statement for gdp
+                    // if (sliderCheck.gdp) {
+                    //     if (gdpComparison(feature, selectedGDP, gdpValPercent) ) {
+                    //         if(sliderCheck.carbon) {
+                    //             if (carbonComparision(feature, selectedCarbon, carbonValPercent) ) {
+                    //                 return true;
+                    //             } else {
+                    //                 return false;
+                    //             }
+                    //         }
+                    //         return true;
+                    //     } else {
+                    //         return false;
+                    //     }
+                    // }
+                    
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+            */
+            
+            if (feature.properties.POPULATION > (selectedPopulation * (1.0 - popValPercent)) && 
+                feature.properties.POPULATION < (selectedPopulation * (1.0 + popValPercent)) &&
+                feature.properties.CARBON > (selectedCarbon * (1.0 - carbonValPercent)) &&
+                feature.properties.CARBON < (selectedCarbon * (1.0 + carbonValPercent)) ) 
             {
                 foundMatches = true;
                 addMarkerActions(feature);
@@ -203,6 +278,10 @@ function searchPopulationPercent() {
             } else {
                 return false;
             }
+
+
+
+
         }})
         if (foundMatches) {
             mymap.fitBounds(search.getBounds());
@@ -213,6 +292,24 @@ function searchPopulationPercent() {
     });
 }
 
+function populationComparison(feature, selectedPopulation, popValPercent) {
+    if (feature.properties.POPULATION > (selectedPopulation * (1.0 - popValPercent)) && 
+        feature.properties.POPULATION < (selectedPopulation * (1.0 + popValPercent))){
+        return true;
+    }
+    return false;
+}
+
+function carbonComparision(feature, selectedCarbon, carbonValPercent) {
+    if (feature.properties.CARBON > (selectedCarbon * (1.0 - carbonValPercent)) &&
+        feature.properties.CARBON < (selectedCarbon * (1.0 + carbonValPercent))) {
+        return true;
+    }
+    return false;
+}
+
+// This method adds each location found into the dropdown option and adds the location marker into the
+//  marker group layer.
 function addMarkerActions(feature) {
     var content = popupContent(feature);
     var dropDown = document.getElementById("dropDown");
@@ -228,6 +325,7 @@ function addMarkerActions(feature) {
     });
 }
 
+// This method removes all the options within the dropdown list
 function removeLocationOptions() {
     var locationList = document.getElementById("dropDown");
     for ( var i = locationList.options.length -1 ; i >= 0 ; i-- ) {
