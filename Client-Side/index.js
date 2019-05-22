@@ -1,4 +1,4 @@
-//Editors: Jesse Tran, Stone Kaech, Jeewon Ha
+//Editors: Jesse Tran, Stone Kaech, Jeewon Ha, Seohyung Lee
 
 'use strict';
 
