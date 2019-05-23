@@ -315,8 +315,8 @@ function filterComparison(feature, initialAmount, range, type) {
         featureType = feature.properties.CARBON
     } //else type gdp
 
-    if (featureType > (initialAmount * (1.0 - range)) && 
-        featureType < (initialAmount * (1.0 + range))){
+    if (featureType >= (initialAmount * (1.0 - range)) && 
+        featureType <= (initialAmount * (1.0 + range))){
         return true;
     }
     return false;
