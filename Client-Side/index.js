@@ -109,7 +109,6 @@ function activateSlider(element) {
     let sliderEle = document.getElementById(element + "SliderID");
     let searchbox = document.getElementById("controlbox");
     let panelHeaderTitle = document.getElementById("panel-header-title");
-    console.log(element)
     if( checkboxEle.checked == true ) {
         sliderEle.parentElement.parentElement.parentElement.style.display = "block";
         sliderCheck[element] = true;
@@ -207,7 +206,28 @@ function searchPopulationPercent() {
         var selectedProperties = markerObject[dropDownValue]._layers[ markerObject[dropDownValue]._leaflet_id - 1 ].feature.properties
         var selectedPopulation = selectedProperties.POPULATION;
         var selectedCarbon = selectedProperties.CARBON;
-        var marker_HASC_2 = markerObject[dropDownValue]._layers[ markerObject[dropDownValue]._leaflet_id - 1 ].feature.properties.HASC_2;
+        
+        var selectedLocation = {
+            population : {
+                name: "population",
+                valPercent: values.population / 100,
+                value: selectedProperties.POPULATION,
+                slider: sliderCheck.population
+            },
+            carbon : {
+                name: "carbon",
+                valPercent: values.carbon / 100,
+                value: selectedProperties.CARBON,
+                slider: sliderCheck.carbon
+            },
+            gdp : {
+                name: "gdp",
+                valPercent: values.gdp / 100,
+                value: 0, //insert value amount
+                slider: sliderCheck.gdp
+            }
+        }
+
         var foundMatches = false;
         var search;
         
@@ -217,70 +237,15 @@ function searchPopulationPercent() {
 
         search = L.geoJson(data, {filter: function(feature) {
            
-            /*
-            
-            // There only needs to be one comparision functions, they're all the same
-            // Can be shortened, make new function for the IF statements, function returns true or false
-            //  Parameters passed in is an object/array pertaining to the order of checks
-            if (sliderCheck.population) {
-                if (populationComparison(feature, selectedPopulation, popValPercent) ) {
-                    if (sliderCheck.carbon) {
-                        if (carbonComparision(feature, selectedCarbon, carbonValPercent) ) {
-                            // Another if statement for gdp
-                            // if (sliderCheck.gdp) {
-                            //     if (gdpComparison(feature, selectedGDP, gdpValPercent) ) {
-                            //         return true;
-                            //     } else {
-                            //         return false;
-                            //     }
-                            // }
-                            
-                            return true;
-                        } else {
-                            return false;
-                        }
-                        
-                    } 
-                    // Another if statement for gdp
-                    // if (sliderCheck.gdp) {
-                    //     if (gdpComparison(feature, selectedGDP, gdpValPercent) ) {
-                    //         if(sliderCheck.carbon) {
-                    //             if (carbonComparision(feature, selectedCarbon, carbonValPercent) ) {
-                    //                 return true;
-                    //             } else {
-                    //                 return false;
-                    //             }
-                    //         }
-                    //         return true;
-                    //     } else {
-                    //         return false;
-                    //     }
-                    // }
-                    
-                    return true;
-                } else {
-                    return false;
-                }
-            } else {
-                return false;
-            }
-            */
-            
-            if (feature.properties.POPULATION > (selectedPopulation * (1.0 - popValPercent)) && 
-                feature.properties.POPULATION < (selectedPopulation * (1.0 + popValPercent)) &&
-                feature.properties.CARBON > (selectedCarbon * (1.0 - carbonValPercent)) &&
-                feature.properties.CARBON < (selectedCarbon * (1.0 + carbonValPercent)) ) 
-            {
+            if (cycleSelectedFilters(feature, selectedLocation.population, selectedLocation.carbon, selectedLocation.gdp) ){
                 foundMatches = true;
-                addMarkerActions(feature);
                 return true;
-
-            } else {
+            } else if (cycleSelectedFilters(feature, selectedLocation.population, selectedLocation.carbon, selectedLocation.gdp) ) {
+                foundMatches = true;
+                return true;
+            } else { //Add another else if for gdp
                 return false;
             }
-
-
-
 
         }})
         if (foundMatches) {
@@ -292,9 +257,59 @@ function searchPopulationPercent() {
     });
 }
 
-function populationComparison(feature, selectedPopulation, popValPercent) {
-    if (feature.properties.POPULATION > (selectedPopulation * (1.0 - popValPercent)) && 
-        feature.properties.POPULATION < (selectedPopulation * (1.0 + popValPercent))){
+function cycleSelectedFilters(feature, selection1, selection2, selection3) {
+    if (selection1.slider) {
+        if (filterComparison(feature, selection1.value, selection1.valPercent, selection1.name) ) {
+            if (selection2.slider) {
+                if (filterComparison(feature, selection2.value, selection2.valPercent, selection2.name) ) {
+                    // Another if statement for gdp
+                    // if (sliderCheck.gdp) {
+                    //     if (gdpComparison(feature, selectedGDP, gdpValPercent) ) {
+                    //         return true;
+                    //     } else {
+                    //         return false;
+                    //     }
+                    // }
+                    addMarkerActions(feature);
+                    return true;
+                } else {
+                    return false;
+                }
+                
+            } 
+            // Another if statement for gdp
+            // if (sliderCheck.gdp) {
+            //     if (gdpComparison(feature, selectedGDP, gdpValPercent) ) {
+            //         if(sliderCheck.carbon) {
+            //             if (carbonComparision(feature, selectedCarbon, carbonValPercent) ) {
+            //                 return true;
+            //             } else {
+            //                 return false;
+            //             }
+            //         }
+            //         return true;
+            //     } else {
+            //         return false;
+            //     }
+            // }
+            addMarkerActions(feature);
+            return true;
+        } else {
+            return false;
+        }
+    }                                      
+}
+
+function filterComparison(feature, initialAmount, range, type) {
+    var featureType;
+    if (type == "population") {
+        featureType = feature.properties.POPULATION
+    } else /* if (type == "carbon") */ {
+        featureType = feature.properties.CARBON
+    } //else type gdp
+
+    if (featureType > (initialAmount * (1.0 - range)) && 
+        featureType < (initialAmount * (1.0 + range))){
         return true;
     }
     return false;
