@@ -196,16 +196,17 @@ function onClickSearch(input) {
 function searchPopulationPercent() {
     $.getJSON('./Data/GeoJSONFiles/countypoint.geojson', function(data){
         var dropDownValue = document.getElementById("dropDown").value;
-        if(dropDownValue === "") {
+        if (dropDownValue === "") {
             alert("Location not selected in the dropdown. Canceling search");
             return;
         }
-        var popValPercent = values.population / 100;
-        var carbonValPercent = values.carbon / 100;
-        var gdpValPercent = values.gdp / 100;
-        var selectedProperties = markerObject[dropDownValue]._layers[ markerObject[dropDownValue]._leaflet_id - 1 ].feature.properties
-        var selectedPopulation = selectedProperties.POPULATION;
-        var selectedCarbon = selectedProperties.CARBON;
+        
+        if (!sliderCheck.carbon && !sliderCheck.gdp && !sliderCheck.population) {
+            alert("No filters selected. Canceling search");
+            return;
+        }
+
+        var selectedProperties = markerObject[dropDownValue]._layers[ markerObject[dropDownValue]._leaflet_id - 1 ].feature.properties;
         
         var selectedLocation = {
             population : {
@@ -224,7 +225,7 @@ function searchPopulationPercent() {
                 name: "gdp",
                 valPercent: values.gdp / 100,
                 value: 0, //insert value amount
-                slider: sliderCheck.gdp
+                slider: false // change to sliderCheck.gdp after getting data
             }
         }
 
@@ -237,6 +238,7 @@ function searchPopulationPercent() {
 
         search = L.geoJson(data, {filter: function(feature) {
            
+            //Each if statements calls the same function but changes the ordering of filter options
             if (cycleSelectedFilters(feature, selectedLocation.population, selectedLocation.carbon, selectedLocation.gdp) ){
                 foundMatches = true;
                 return true;
@@ -257,6 +259,9 @@ function searchPopulationPercent() {
     });
 }
 
+// This function goes through each filter selection and determines in the filter will apply and will
+//  add a new marker for the feature accordingly
+// If feature is within the filter bounds, the method will return true, otherwise it will return false
 function cycleSelectedFilters(feature, selection1, selection2, selection3) {
     if (selection1.slider) {
         if (filterComparison(feature, selection1.value, selection1.valPercent, selection1.name) ) {
@@ -300,6 +305,8 @@ function cycleSelectedFilters(feature, selection1, selection2, selection3) {
     }                                      
 }
 
+// This method compares the feature with the filter bounds
+// The method will return true if the feature is within bounds and false if not
 function filterComparison(feature, initialAmount, range, type) {
     var featureType;
     if (type == "population") {
@@ -310,14 +317,6 @@ function filterComparison(feature, initialAmount, range, type) {
 
     if (featureType > (initialAmount * (1.0 - range)) && 
         featureType < (initialAmount * (1.0 + range))){
-        return true;
-    }
-    return false;
-}
-
-function carbonComparision(feature, selectedCarbon, carbonValPercent) {
-    if (feature.properties.CARBON > (selectedCarbon * (1.0 - carbonValPercent)) &&
-        feature.properties.CARBON < (selectedCarbon * (1.0 + carbonValPercent))) {
         return true;
     }
     return false;
