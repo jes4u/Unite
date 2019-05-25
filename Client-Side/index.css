@@ -16,12 +16,10 @@ body {
     transition: .3s background-color;
 }
 
-.nav a {
-    text-decoration: none;
-    color: black;
-    font-size: 18px;
-    display: block;
-    transition: .3s background-color;
+#exampleModalCenter {
+    height: 100%;
+    width: 100%;
+
 }
 
 .navbar ul{
@@ -34,6 +32,22 @@ html, body, #mapid {
 }
 
 
+
 .hidden {
     display: none;
+}
+
+button.btn.btn-primary {
+    Color: black;
+    font:smaller;
+    background:transparent;
+    font-style: initial;
+    border-color: black;
+    display: block;
+
+}
+
+
+#about_menu{
+    font-size:0.8rem;
 }
