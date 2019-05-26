@@ -27,7 +27,7 @@ var selectedFeature;
 var search;
 var mymap;
 var currentSelcted;
-var dropDownOptions = [];
+var control;
 
 $(document).ready(function() {
 
@@ -48,7 +48,7 @@ $(document).ready(function() {
     mymap.zoomControl.setPosition('bottomright');
 
     var searchboxControl=createSearchboxControl();
-    var control = new searchboxControl({
+    control = new searchboxControl({
         sidebarTitleText: "",
         sidebarMenuItems: {
             Items: [
@@ -89,13 +89,23 @@ $(document).ready(function() {
     }
     mymap.addControl(control);
 
-   
+
 
 
 });
 
-function addPopup(feature, layer){
-  layer.bindPopup(feature.properties.NAME_0);
+function checkScale() {
+  var scale = document.getElementById("scale");
+  var value = scale.options[scale.selectedIndex].value;
+  if (value == "nation") {
+    return "nationpoint.geojson";
+  } else if (value == "state") {
+    return "statepoint.geojson";
+  } else if (value == "county") {
+    return "countypoint.geojson";
+  } else {
+    return "citypoint.geojson";
+  }
 }
 
 //onclick checkboxes makes sliders appear and disappear
@@ -125,99 +135,138 @@ function popupContent(feature) {
     var content = document.createElement("div");
     var country = document.createElement("p");
     country.innerHTML = "Country: " + feature.properties.NAME_0;
-    var city = document.createElement("p");
-    city.innerHTML = "City/Province: " + feature.properties.NAME_1;
+    country.value = feature.properties.NAME_0;
+    country.style.display = "none";
+    var state = document.createElement("p");
+    state.innerHTML = "State: " + feature.properties.NAME_1;
+    state.value = feature.properties.NAME_1;
+    state.style.display = "none";
     var county = document.createElement("p");
     county.innerHTML = "County: " + feature.properties.NAME_2;
+    county.value = feature.properties.NAME_2 + " County";
+    county.style.display = "none";
+    var city = document.createElement("p");
+    city.innerHTML = "City: " + feature.properties.NAME_3;
+    city.value = feature.properties.NAME_3;
+    city.style.display = "none";
+    var link = document.createElement("a");
+    content.appendChild(country);
+    content.appendChild(state);
+    content.appendChild(county);
+    content.appendChild(city);
+    content = themeInfo(feature, content);
+    var keyword = "";
+    keyword += scaleInfo(content, keyword);
+    keyword += themeKeyword();
+    link.href = "http://www.google.com/search?q=" + keyword;
+    link.innerHTML = "Search for more information!";
+    link.target ="_blank";
+    content.appendChild(link);
+    currentSelcted = feature;
+    return content;
+}
+
+function scaleInfo(content, keyword){
+  var scale = document.getElementById("scale");
+  var selected = scale.options[scale.selectedIndex].id;
+  for(var i = 0; i < parseInt(selected); i++){
+    content.childNodes[i].style.display = "block";
+    keyword += content.childNodes[i].value + " ";
+  }
+  return keyword;
+}
+
+function themeKeyword(){
+  if(document.getElementById("gdpID").checked) {
+    return "GDP";
+  } else if (document.getElementById("populationID").checked) {
+    return "Population";
+  } else if (document.getElementById("carbonID").checked) {
+    return "Carbon Emission";
+  } else {
+    return "";
+  }
+}
+
+function themeInfo(feature, content){
+  if(document.getElementById("gdpID").checked) {
+    // gdp to be added
+  }
+  if(document.getElementById("populationID").checked) {
     var population = document.createElement("p");
     population.innerHTML = "Population: " + feature.properties.POPULATION;
     var popDensity = document.createElement("p");
     popDensity.innerHTML = "Population Density: " + feature.properties.POPDENSITY;
+    content.appendChild(population);
+    content.appendChild(popDensity);
+  }
+  if (document.getElementById("carbonID").checked) {
     var carbon = document.createElement("p");
     carbon.innerHTML = "Carbon Emission Level: " + feature.properties.CARBON;
     var perCapCarbon = document.createElement("p");
     perCapCarbon.innerHTML = "Carbon Emission per Capita: " + feature.properties.PERCAPCARB;
-
-    var link = document.createElement("a");
-    link.href = "http://www.google.com/search?q=" + feature.properties.NAME_0 + "+" + feature.properties.NAME_1 + "+" + feature.properties.NAME_2;
-    link.innerHTML = "Search for more information!";
-    content.appendChild(country);
-    content.appendChild(city);
-    content.appendChild(county);
-    content.appendChild(population);
-    content.appendChild(popDensity);
     content.appendChild(carbon);
     content.appendChild(perCapCarbon);
-    content.appendChild(link);
-    //console.log(content.childNodes);
-
-    currentSelcted = feature;
-
-    return content;
   }
+  return content;
+}
 
 function onClickSearch(input) {
-    $.getJSON('./Data/GeoJSONFiles/countypoint.geojson', function(data){
+    //var input = document.getElementById('searchbox').value;
+    $.getJSON("/Data/GeoJSONFiles/" + checkScale(), function(data){
         if (typeof search != "undefined") {
             search.clearLayers();
         }
+        var content;
         search = L.geoJson(data, {filter: function(feature) {
             selectedFeature = feature;
             if (feature.properties.NAME_2 == null) {
                 return false;
             }
             if(feature.properties.NAME_2.toString().toLowerCase() == input.toString().toLowerCase()){
-                addMarkerActions(feature);
-                return true;
+                content = popupContent(feature);
 
+                var dropDown = document.getElementById("dropDown");
+                var option = document.createElement("option");
+                option.value = '"' + feature.properties.GID_2 + '"';
+                option.innerHTML = feature.properties.NAME_2 + " County " + feature.properties.NAME_1 + ", " + feature.properties.NAME_0;
+                dropDown.appendChild(option);
+
+                //console.log(feature)
+                L.geoJson(feature).bindPopup(content).addTo(mymap);
+
+                return true;
             }
             return false;
-        }}) 
+            //need to apply bindpopup to every feature in true
+        }})
         mymap.fitBounds(search.getBounds())
     });
+    //console.log(selectedFeature)
 }
 
 //Old name: useLocation
 function searchPopulationPercent() {
+    console.log(values)
     var input = $("#searchboxinput").val
     onClickSearch(input);
+    var content;
     var popValPercent = values.population / 100;
     var carbonValPercent = values.carbon / 100;
     var gdpValPercent = values.gdp / 100;
-    $.getJSON('./Data/GeoJSONFiles/countypoint.geojson', function(data){
-        //var content;
+    $.getJSON("/Data/GeoJSONFiles/countypoint.geojson", function(data){
         if (typeof search != "undefined") {
             search.clearLayers();
         }
         search = L.geoJson(data, {filter: function(feature) {
-            
-            if (((feature.properties.POPULATION > (selectedFeature.properties.POPULATION * (1.0 - popValPercent)) && 
-                feature.properties.POPULATION < (selectedFeature.properties.POPULATION * (1.0 + popValPercent)))) || 
-                feature.properties.HASC_2 == selectedFeature.properties.HASC_2) 
-            {
-
-                addMarkerActions(feature);
-                return true;
-
-            } else {
-                return false;
+            if (((feature.properties.POPULATION > (selectedFeature.properties.POPULATION * (1.0 - popValPercent)) &&
+            feature.properties.POPULATION < (selectedFeature.properties.POPULATION * (1.0 + popValPercent)))) ||
+            feature.properties.HASC_2 == selectedFeature.properties.HASC_2){
+              content = popupContent(feature);
+              return true;
             }
-        }})
-        mymap.fitBounds(search.getBounds())
-    });
-}
-
-function addMarkerActions(feature) {
-    var content = popupContent(feature);
-    var dropDown = document.getElementById("dropDown");
-    var option = document.createElement("option");
-    option.value = '"' + feature.properties.GID_2 + '"';
-    dropDownOptions.push(feature.properties.GID_2 + "");
-
-    option.innerHTML = feature.properties.NAME_2 + " County " + feature.properties.NAME_1 + ", " + feature.properties.NAME_0;
-    dropDown.appendChild(option);
-    var marker = L.geoJson(feature).bindPopup(content).addTo(mymap);
-    marker.on("click", function(event) { 
-        document.getElementById("dropDown").selectedIndex = dropDownOptions.indexOf(event.layer.feature.properties.GID_2 + "");
+            return false;
+        }}).bindPopup(content).addTo(mymap);
+        mymap.fitBounds(search.getBounds());
     });
 }
