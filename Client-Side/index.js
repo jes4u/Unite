@@ -1,4 +1,4 @@
-//Editors: Jesse Tran, Stone Kaech, Jeewon Ha
+//Editors: Jesse Tran, Stone Kaech, Jeewon Ha, Seohyung Lee
 
 'use strict';
 
@@ -64,7 +64,7 @@ $(document).ready(function() {
             Items: [
                 {
                     type: "checkbox",
-                    name: "GDP",
+                    name: "&ensp; GDP",
                     value: "gdp",
                     onclick: "activateSlider('gdp');",
                     min: sliderValues.gdp.min,
@@ -72,7 +72,7 @@ $(document).ready(function() {
                 },
                 {
                     type: "checkbox",
-                    name: "Population",
+                    name: "&ensp;  Population",
                     value: "population",
                     onclick: "activateSlider('population');",
                     min: sliderValues.population.min,
@@ -80,7 +80,7 @@ $(document).ready(function() {
                 },
                 {
                     type: "checkbox",
-                    name: "Carbon Emissions",
+                    name: "&ensp;  Carbon Emissions",
                     value: "carbon",
                     onclick: "activateSlider('carbon');" ,
                     min: sliderValues.carbon.min,

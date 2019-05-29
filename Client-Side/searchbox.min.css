@@ -54,7 +54,7 @@
 }
 
 .searchbox-shadow{
-    box-shadow:0 2px 4px rgba(0,0,0,.2),0 -1px 0 rgba(0,0,0,.02)
+    box-shadow:0 2px 4px rgba(0,0,0,.2),0 -1px 0 rgba(0,0,0,.02);
 }
 
 .searchbox-menu-container{
@@ -119,10 +119,10 @@ a,button,h1,h2,h3,h4,h5,h6,input,ol,p,textarea,th,ul{
 }
 
 .panel{
-    width:408px;
+    width:398px;
     float:left;
-    height:550px;
-    background:#fff;
+    height:450px;
+    background-color: #ECEBE5 !important;;
     position:relative;
     display:none
 }
@@ -152,11 +152,11 @@ a,button,h1,h2,h3,h4,h5,h6,input,ol,p,textarea,th,ul{
 }
 
 .panel-close-button:hover{
-    opacity:.94
+    opacity:.8;
 }
 
 .panel-list{
-    border-top:1px solid #d9d9d9;color:#777;font-size:13px;padding-top:10px
+    border-top:1px solid #d9d9d9;color:black;font-size:13px;padding-top:10px
 }
 
 .panel-list-item{
@@ -164,7 +164,7 @@ a,button,h1,h2,h3,h4,h5,h6,input,ol,p,textarea,th,ul{
 }
 
 .panel-list-item-icon{
-    width:22px;height:22px;display:inline-block;opacity:.5;margin-right:25px
+    width:22px;height:22px;display:inline-block;opacity:.5; margin-right:0px
 }
 
 .panel-content a,button,li:hover{
