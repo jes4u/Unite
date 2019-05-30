@@ -1,4 +1,4 @@
-//Editors: Jesse Tran, Stone Kaech, Jeewon Ha
+//Editors: Jesse Tran, Stone Kaech, Jeewon Ha, Seohyung Lee
 
 'use strict';
 
@@ -7,6 +7,12 @@ var values = {
     gdp: 0,
     carbon: 0
 };
+
+var sliderCheck = {
+    population: false,
+    gdp: false,
+    carbon: false
+}
 
 var sliderValues = {
     population : {
@@ -23,11 +29,17 @@ var sliderValues = {
     }
 }
 
-var selectedFeature;
-var search;
+//Map object
 var mymap;
 var currentSelcted;
 var control;
+
+// Array of Options tags for the dropdown/Select tag
+var dropDownOptions = [];
+// Object variabel containing the data of each marker on the map. Key is the location's GID_2, value is the marker object
+var markerObject = {};
+// Layer group for markers
+var markerLayer;
 
 $(document).ready(function() {
 
@@ -47,6 +59,7 @@ $(document).ready(function() {
 
     mymap.zoomControl.setPosition('bottomright');
 
+    // The variables searchboxControl and control determine the options within the filter panel
     var searchboxControl=createSearchboxControl();
     control = new searchboxControl({
         sidebarTitleText: "",
@@ -54,7 +67,7 @@ $(document).ready(function() {
             Items: [
                 {
                     type: "checkbox",
-                    name: "GDP",
+                    name: "&ensp; GDP",
                     value: "gdp",
                     onclick: "activateSlider('gdp');",
                     min: sliderValues.gdp.min,
@@ -62,7 +75,7 @@ $(document).ready(function() {
                 },
                 {
                     type: "checkbox",
-                    name: "Population",
+                    name: "&ensp;  Population",
                     value: "population",
                     onclick: "activateSlider('population');",
                     min: sliderValues.population.min,
@@ -70,7 +83,7 @@ $(document).ready(function() {
                 },
                 {
                     type: "checkbox",
-                    name: "Carbon Emissions",
+                    name: "&ensp;  Carbon Emissions",
                     value: "carbon",
                     onclick: "activateSlider('carbon');" ,
                     min: sliderValues.carbon.min,
@@ -79,8 +92,9 @@ $(document).ready(function() {
             ]
         }
     });
-    control._searchfunctionCallBack = function (searchkeywords)
-    {
+
+    // Onclick search button
+    control._searchfunctionCallBack = function (searchkeywords){
         if (!searchkeywords) {
             searchkeywords = "The search call back is clicked !!"
         }
@@ -88,9 +102,8 @@ $(document).ready(function() {
         onClickSearch(searchkeywords)
     }
     mymap.addControl(control);
-
-
-
+  
+    markerLayer = L.layerGroup().addTo(mymap);
 
 });
 
@@ -109,28 +122,36 @@ function checkScale() {
 }
 
 //onclick checkboxes makes sliders appear and disappear
+
+   
+//}); moved to line 108
+
+// This method controls the display of the sliders within the filter panel. 
+//If the checkbox is checked then the slider appears, if it is not checked, the slider disappears
+
 function activateSlider(element) {
-    //console.log(element);
     let checkboxEle = document.getElementById(element + "ID");
     let sliderEle = document.getElementById(element + "SliderID");
     let searchbox = document.getElementById("controlbox");
     let panelHeaderTitle = document.getElementById("panel-header-title");
     if( checkboxEle.checked == true ) {
         sliderEle.parentElement.parentElement.parentElement.style.display = "block";
+        sliderCheck[element] = true;
     } else {
         sliderEle.parentElement.parentElement.parentElement.style.display = "none";
+        sliderCheck[element] = false;
     }
 
 }
 
-//store values when submit button
+// This method constantly updates the display for current slider value everytime the slider changes value
 function updateSliderValue(element, value) {
-    //console.log(element + " has value " + value);
     values[element] = value
     let valEle= "value" + element;
     document.getElementById(valEle).innerHTML = "Value: " + value;
 }
 
+//This method displays all the texts with each marker
 function popupContent(feature) {
     var content = document.createElement("div");
     var country = document.createElement("p");
@@ -207,46 +228,77 @@ function themeInfo(feature, content){
     perCapCarbon.innerHTML = "Carbon Emission per Capita: " + feature.properties.PERCAPCARB;
     content.appendChild(carbon);
     content.appendChild(perCapCarbon);
+
   }
   return content;
 }
 
+// This method is called after the search button is pressed, the method will search through
+//  the geoJSON file and create markers for each location that matches the results
+// If there are no results, an error will appear saying no location has been found
 function onClickSearch(input) {
+//<<<<<<< template
     //var input = document.getElementById('searchbox').value;
     $.getJSON("/Data/GeoJSONFiles/" + checkScale(), function(data){
-        if (typeof search != "undefined") {
-            search.clearLayers();
-        }
+        //if (typeof search != "undefined") {
+        //    search.clearLayers();
+        //}
         var content;
+//=======
+    //$.getJSON('./Data/GeoJSONFiles/countypoint.geojson', function(data){
+        var search;
+        var foundLocation = false;
+        markerLayer.clearLayers();
+        removeLocationOptions();
+        dropDownOptions = [];
+//>>>>>>> master
         search = L.geoJson(data, {filter: function(feature) {
-            selectedFeature = feature;
             if (feature.properties.NAME_2 == null) {
                 return false;
             }
             if(feature.properties.NAME_2.toString().toLowerCase() == input.toString().toLowerCase()){
-                content = popupContent(feature);
+//<<<<<<< template
+//                 content = popupContent(feature);
 
-                var dropDown = document.getElementById("dropDown");
-                var option = document.createElement("option");
-                option.value = '"' + feature.properties.GID_2 + '"';
-                option.innerHTML = feature.properties.NAME_2 + " County " + feature.properties.NAME_1 + ", " + feature.properties.NAME_0;
-                dropDown.appendChild(option);
+//                 var dropDown = document.getElementById("dropDown");
+//                 var option = document.createElement("option");
+//                 option.value = '"' + feature.properties.GID_2 + '"';
+//                 option.innerHTML = feature.properties.NAME_2 + " County " + feature.properties.NAME_1 + ", " + feature.properties.NAME_0;
+//                 dropDown.appendChild(option);
 
                 //console.log(feature)
-                L.geoJson(feature).bindPopup(content).addTo(mymap);
+                //L.geoJson(feature).bindPopup(content).addTo(mymap);
 
+                //return true;
+            //}
+            //return false;
+            //need to apply bindpopup to every feature in true
+        //}})
+        //mymap.fitBounds(search.getBounds())
+//=======
+                addMarkerActions(feature);
+                foundLocation = true;
                 return true;
             }
             return false;
-            //need to apply bindpopup to every feature in true
-        }})
-        mymap.fitBounds(search.getBounds())
+        }}) 
+        if(foundLocation) {
+            mymap.fitBounds(search.getBounds())
+        } else {
+            alert("Location not found... replace with modal popup");
+        }
+        
+//>>>>>>> master
     });
     //console.log(selectedFeature)
 }
 
-//Old name: useLocation
+// This method is called after the submit button is pressed within the filter panel
+// When called, the method will use the filtered values and search the geoJSON files for 
+//  locations that fits within the filtered range and will throw and error if there are no
+//  results found
 function searchPopulationPercent() {
+/*<<<<<<< template
     console.log(values)
     var input = $("#searchboxinput").val
     onClickSearch(input);
@@ -268,5 +320,159 @@ function searchPopulationPercent() {
             return false;
         }}).bindPopup(content).addTo(mymap);
         mymap.fitBounds(search.getBounds());
+=======
+*/{
+    $.getJSON("/Data/GeoJSONFiles/" + checkScale(), function(data){
+    //$.getJSON('./Data/GeoJSONFiles/countypoint.geojson', function(data){
+        var dropDownValue = document.getElementById("dropDown").value;
+        if (dropDownValue === "") {
+            alert("Location not selected in the dropdown. Canceling search");
+            return;
+        }
+        
+        if (!sliderCheck.carbon && !sliderCheck.gdp && !sliderCheck.population) {
+            alert("No filters selected. Canceling search");
+            return;
+        }
+
+        var selectedProperties = markerObject[dropDownValue]._layers[ markerObject[dropDownValue]._leaflet_id - 1 ].feature.properties;
+        
+        var selectedLocation = {
+            population : {
+                name: "population",
+                valPercent: values.population / 100,
+                value: selectedProperties.POPULATION,
+                slider: sliderCheck.population
+            },
+            carbon : {
+                name: "carbon",
+                valPercent: values.carbon / 100,
+                value: selectedProperties.CARBON,
+                slider: sliderCheck.carbon
+            },
+            gdp : {
+                name: "gdp",
+                valPercent: values.gdp / 100,
+                value: 0, //insert value amount
+                slider: false // change to sliderCheck.gdp after getting data
+            }
+        }
+
+        var foundMatches = false;
+        var search;
+        
+        markerLayer.clearLayers();
+        removeLocationOptions();
+        dropDownOptions = [];
+
+        search = L.geoJson(data, {filter: function(feature) {
+           
+            //Each if statements calls the same function but changes the ordering of filter options
+            if (cycleSelectedFilters(feature, selectedLocation.population, selectedLocation.carbon, selectedLocation.gdp) ){
+                foundMatches = true;
+                return true;
+            } else if (cycleSelectedFilters(feature, selectedLocation.population, selectedLocation.carbon, selectedLocation.gdp) ) {
+                foundMatches = true;
+                return true;
+            } else { //Add another else if for gdp
+                return false;
+            }
+
+        }})
+        if (foundMatches) {
+            mymap.fitBounds(search.getBounds());
+        } else {
+            alert("No matches found.... replace with modal popup");
+        }
+        
     });
+}
+
+// This function goes through each filter selection and determines in the filter will apply and will
+//  add a new marker for the feature accordingly
+// If feature is within the filter bounds, the method will return true, otherwise it will return false
+function cycleSelectedFilters(feature, selection1, selection2, selection3) {
+    if (selection1.slider) {
+        if (filterComparison(feature, selection1.value, selection1.valPercent, selection1.name) ) {
+            if (selection2.slider) {
+                if (filterComparison(feature, selection2.value, selection2.valPercent, selection2.name) ) {
+                    // Another if statement for gdp
+                    // if (sliderCheck.gdp) {
+                    //     if (gdpComparison(feature, selectedGDP, gdpValPercent) ) {
+                    //         return true;
+                    //     } else {
+                    //         return false;
+                    //     }
+                    // }
+                    addMarkerActions(feature);
+                    return true;
+                } else {
+                    return false;
+                }
+                
+            } 
+            // Another if statement for gdp
+            // if (sliderCheck.gdp) {
+            //     if (gdpComparison(feature, selectedGDP, gdpValPercent) ) {
+            //         if(sliderCheck.carbon) {
+            //             if (carbonComparision(feature, selectedCarbon, carbonValPercent) ) {
+            //                 return true;
+            //             } else {
+            //                 return false;
+            //             }
+            //         }
+            //         return true;
+            //     } else {
+            //         return false;
+            //     }
+            // }
+            addMarkerActions(feature);
+            return true;
+        } else {
+            return false;
+        }
+    }                                      
+}
+
+// This method compares the feature with the filter bounds
+// The method will return true if the feature is within bounds and false if not
+function filterComparison(feature, initialAmount, range, type) {
+    var featureType;
+    if (type == "population") {
+        featureType = feature.properties.POPULATION
+    } else /* if (type == "carbon") */ {
+        featureType = feature.properties.CARBON
+    } //else type gdp
+
+    if (featureType >= (initialAmount * (1.0 - range)) && 
+        featureType <= (initialAmount * (1.0 + range))){
+        return true;
+    }
+    return false;
+}
+
+// This method adds each location found into the dropdown option and adds the location marker into the
+//  marker group layer.
+function addMarkerActions(feature) {
+    var content = popupContent(feature);
+    var dropDown = document.getElementById("dropDown");
+    var option = document.createElement("option");
+    option.value = feature.properties.GID_2;
+    dropDownOptions.push(feature.properties.GID_2 + "");
+    option.innerHTML = feature.properties.NAME_2 + " County " + feature.properties.NAME_1 + ", " + feature.properties.NAME_0;
+    dropDown.appendChild(option);
+    var marker = L.geoJson(feature).bindPopup(content).addTo(markerLayer);
+    markerObject[feature.properties.GID_2] = marker
+    marker.on("click", function(event) { 
+        document.getElementById("dropDown").selectedIndex = dropDownOptions.indexOf(event.layer.feature.properties.GID_2 + "");
+//>>>>>>> master conflict started on line 291
+    });
+}
+
+// This method removes all the options within the dropdown list
+function removeLocationOptions() {
+    var locationList = document.getElementById("dropDown");
+    for ( var i = locationList.options.length -1 ; i >= 0 ; i-- ) {
+        locationList.remove(i);
+    }
 }
