@@ -321,7 +321,7 @@ function searchPopulationPercent() {
         }}).bindPopup(content).addTo(mymap);
         mymap.fitBounds(search.getBounds());
 =======
-*/{
+*/
     $.getJSON("/Data/GeoJSONFiles/" + checkScale(), function(data){
     //$.getJSON('./Data/GeoJSONFiles/countypoint.geojson', function(data){
         var dropDownValue = document.getElementById("dropDown").value;
