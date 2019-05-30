@@ -121,14 +121,8 @@ function checkScale() {
   }
 }
 
-//onclick checkboxes makes sliders appear and disappear
-
-   
-//}); moved to line 108
-
 // This method controls the display of the sliders within the filter panel. 
 //If the checkbox is checked then the slider appears, if it is not checked, the slider disappears
-
 function activateSlider(element) {
     let checkboxEle = document.getElementById(element + "ID");
     let sliderEle = document.getElementById(element + "SliderID");
@@ -237,45 +231,17 @@ function themeInfo(feature, content){
 //  the geoJSON file and create markers for each location that matches the results
 // If there are no results, an error will appear saying no location has been found
 function onClickSearch(input) {
-//<<<<<<< template
-    //var input = document.getElementById('searchbox').value;
     $.getJSON("/Data/GeoJSONFiles/" + checkScale(), function(data){
-        //if (typeof search != "undefined") {
-        //    search.clearLayers();
-        //}
-        var content;
-//=======
-    //$.getJSON('./Data/GeoJSONFiles/countypoint.geojson', function(data){
         var search;
         var foundLocation = false;
         markerLayer.clearLayers();
         removeLocationOptions();
         dropDownOptions = [];
-//>>>>>>> master
         search = L.geoJson(data, {filter: function(feature) {
             if (feature.properties.NAME_2 == null) {
                 return false;
             }
             if(feature.properties.NAME_2.toString().toLowerCase() == input.toString().toLowerCase()){
-//<<<<<<< template
-//                 content = popupContent(feature);
-
-//                 var dropDown = document.getElementById("dropDown");
-//                 var option = document.createElement("option");
-//                 option.value = '"' + feature.properties.GID_2 + '"';
-//                 option.innerHTML = feature.properties.NAME_2 + " County " + feature.properties.NAME_1 + ", " + feature.properties.NAME_0;
-//                 dropDown.appendChild(option);
-
-                //console.log(feature)
-                //L.geoJson(feature).bindPopup(content).addTo(mymap);
-
-                //return true;
-            //}
-            //return false;
-            //need to apply bindpopup to every feature in true
-        //}})
-        //mymap.fitBounds(search.getBounds())
-//=======
                 addMarkerActions(feature);
                 foundLocation = true;
                 return true;
@@ -288,9 +254,7 @@ function onClickSearch(input) {
             alert("Location not found... replace with modal popup");
         }
         
-//>>>>>>> master
     });
-    //console.log(selectedFeature)
 }
 
 // This method is called after the submit button is pressed within the filter panel
@@ -298,30 +262,6 @@ function onClickSearch(input) {
 //  locations that fits within the filtered range and will throw and error if there are no
 //  results found
 function searchPopulationPercent() {
-/*<<<<<<< template
-    console.log(values)
-    var input = $("#searchboxinput").val
-    onClickSearch(input);
-    var content;
-    var popValPercent = values.population / 100;
-    var carbonValPercent = values.carbon / 100;
-    var gdpValPercent = values.gdp / 100;
-    $.getJSON("/Data/GeoJSONFiles/countypoint.geojson", function(data){
-        if (typeof search != "undefined") {
-            search.clearLayers();
-        }
-        search = L.geoJson(data, {filter: function(feature) {
-            if (((feature.properties.POPULATION > (selectedFeature.properties.POPULATION * (1.0 - popValPercent)) &&
-            feature.properties.POPULATION < (selectedFeature.properties.POPULATION * (1.0 + popValPercent)))) ||
-            feature.properties.HASC_2 == selectedFeature.properties.HASC_2){
-              content = popupContent(feature);
-              return true;
-            }
-            return false;
-        }}).bindPopup(content).addTo(mymap);
-        mymap.fitBounds(search.getBounds());
-=======
-*/
     $.getJSON("/Data/GeoJSONFiles/" + checkScale(), function(data){
     //$.getJSON('./Data/GeoJSONFiles/countypoint.geojson', function(data){
         var dropDownValue = document.getElementById("dropDown").value;
@@ -461,7 +401,11 @@ function addMarkerActions(feature) {
     dropDownOptions.push(feature.properties.GID_2 + "");
     option.innerHTML = feature.properties.NAME_2 + " County " + feature.properties.NAME_1 + ", " + feature.properties.NAME_0;
     dropDown.appendChild(option);
-    var marker = L.geoJson(feature).bindPopup(content).addTo(markerLayer);
+    var marker = L.geoJson(feature).bindPopup(content)//.addTo(markerLayer);
+    marker.setStyle({
+        fillColor: 'white'
+    });
+    marker.addTo(markerLayer);
     markerObject[feature.properties.GID_2] = marker
     marker.on("click", function(event) { 
         document.getElementById("dropDown").selectedIndex = dropDownOptions.indexOf(event.layer.feature.properties.GID_2 + "");
