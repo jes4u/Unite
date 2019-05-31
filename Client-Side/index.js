@@ -37,7 +37,7 @@ var color;
 
 // Array of Options tags for the dropdown/Select tag
 var dropDownOptions = [];
-// Object variabel containing the data of each marker on the map. Key is the location's GID_2, value is the marker object
+// Object variabel containing the data of each marker on the map. Key is the location's ORIG_FID, value is the marker object
 var markerObject = {};
 // Layer group for markers
 var markerLayer;
@@ -140,14 +140,16 @@ function popupContent(feature, title) {
     var content = document.createElement("div");
     var head = document.createElement("p");
     head.innerHTML = title;
-    head.style.display = "none";
+    console.log(title);
     var link = document.createElement("a");
     content.appendChild(head);
     content = themeInfo(feature, content);
-    var keyword = "";
-    keyword += scaleInfo(content, keyword);
-    keyword += themeKeyword();
-    link.href = "http://www.google.com/search?q=" + keyword;
+    // keywork seems to be unhelpful currently so I am replacing it with the title element
+    // additionally, scale Info was causing it to crash
+    // var keyword = "";
+    // keyword += scaleInfo(content, keyword);
+    // keyword += themeKeyword();
+    link.href = "http://www.google.com/search?q=" + title.split(": ")[1];
     link.innerHTML = "Search for more information!";
     link.target ="_blank";
     content.appendChild(link);
@@ -155,15 +157,16 @@ function popupContent(feature, title) {
     return content;
 }
 
-function scaleInfo(content, keyword){
-  var scale = document.getElementById("scale");
-  var selected = scale.options[scale.selectedIndex].id;
-  for(var i = 0; i < parseInt(selected); i++){
-    content.childNodes[i].style.display = "block";
-    keyword += content.childNodes[i].value + " ";
-  }
-  return keyword;
-}
+// function scaleInfo(content, keyword){
+//   var scale = document.getElementById("scale");
+//   var selected = scale.options[scale.selectedIndex].id;
+//   for(var i = 0; i < parseInt(selected); i++){
+//     // this line was causing issues so I commented it out -SK
+//     content.childNodes[i].style.display = "block";
+//     keyword += content.childNodes[i].value + " ";
+//   }
+//   return keyword;
+// }
 
 function themeKeyword(){
   if(document.getElementById("gdpID").checked) {
@@ -235,11 +238,18 @@ function onClickSearch(input) {
         markerLayer.clearLayers();
         removeLocationOptions();
         dropDownOptions = [];
+        var value = 0;
         search = L.geoJson(data, {filter: function(feature) {
             if (feature.properties.UNINAME.split(" ").length == 1) {
                 return false;
             }
-            if (feature.properties.UNINAME.toString().toLowerCase().includes(input.toString().toLowerCase())){
+            value = 0;
+            (input.toString().toLowerCase().split(" ")).forEach(function(word){
+                value += (feature.properties.UNINAME.toString() + feature.properties.NAME 
+                        + feature.properties.NAME_0 + feature.properties.NAME_1 + feature.properties.NAME_2 
+                        + feature.properties.ISO3).toLowerCase().includes(word);
+            });
+            if (value == input.toString().split(" ").length){
                 addMarkerActions(feature);
                 iconColor();
                 foundLocation = true;
@@ -377,9 +387,9 @@ function cycleSelectedFilters(feature, selection1, selection2, selection3) {
 function filterComparison(feature, initialAmount, range, type) {
     var featureType;
     if (type == "population") {
-        featureType = feature.properties.POPULATION
+        featureType = feature.properties.POPULATION;
     } else /* if (type == "carbon") */ {
-        featureType = feature.properties.CARBON
+        featureType = feature.properties.CARBON;
     } //else type gdp
 
     if (featureType >= (initialAmount * (1.0 - range)) &&
@@ -418,12 +428,12 @@ function addMarkerActions(feature) {
     dropDownOptions.push(feature.properties.ORIG_FID + "");
     option.innerHTML = title;
     dropDown.appendChild(option);
-    var marker = L.geoJson(feature).bindPopup(content)//.addTo(markerLayer);
+    var marker = L.geoJson(feature).bindPopup(content);//.addTo(markerLayer);
     marker.setStyle({
         fillColor: 'white'
     });
     marker.addTo(markerLayer);
-    markerObject[feature.properties.ORIG_FID] = marker
+    markerObject[feature.properties.ORIG_FID] = marker;
     marker.on("click", function(event) {
         document.getElementById("dropDown").selectedIndex = dropDownOptions.indexOf(event.layer.feature.properties.ORIG_FID + "");
 //>>>>>>> master conflict started on line 291
