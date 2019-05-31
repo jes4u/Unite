@@ -3,6 +3,29 @@ body {
     margin: 0;
 }
 
+#background {
+    background-color: #ddd;
+}
+
+.nav b {
+    text-decoration: none;
+    color: black;
+    font-size: 25px;
+    display: block;
+    padding: 0;
+    transition: .3s background-color;
+}
+
+#exampleModalCenter {
+    height: 100%;
+    width: 100%;
+
+}
+
+.navbar ul{
+    margin-bottom: 0%;
+}
+
 html, body, #mapid {
     height: 100%;
     width: 100%;
@@ -10,4 +33,19 @@ html, body, #mapid {
 
 .hidden {
     display: none;
+}
+
+button.btn.btn-primary {
+    Color: black;
+    font:smaller;
+    background:transparent;
+    font-style: initial;
+    border-color: black;
+    display: block;
+
+}
+
+
+#about_menu{
+    font-size:0.8rem;
 }

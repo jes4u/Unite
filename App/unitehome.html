@@ -1,0 +1,39 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="unitehome.css" type="text/css">
+  </head>
+  <body>
+    <script src="unitehome.js"></script>
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">GEOG469 UNITE</a>
+        </div>
+        <ul class="nav navbar-nav navbar-right">
+        </ul>
+      </div>
+    </nav>
+
+    <div id="mySidenav" class="sidenav">
+      <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+      <input class="form-control" type="text" placeholder="Search" aria-label="Search" style="margin-left: 5%; width: 80%;">
+      <div class="checkbox">
+        <label><input id="population" type="checkbox" onclick="openfilter('populationFilter')">Population</label>
+        <input id="populationFilter" type="range" class="custom-range" min="0" max="5" style="display:none;">
+      </div>
+      <div class="checkbox">
+        <label><input id="gdp" type="checkbox" onclick="openfilter('gdpFilter')">GDP</label>
+        <input id="gdpFilter" type="range" class="custom-range" min="0" max="59" style="display:none;">
+      </div>
+      <div class="checkbox">
+        <label><input id="carbon" type="checkbox" onclick="openfilter('carbonFilter')">Carbon Emission</label>
+        <input id="carbonFilter" type="range" class="custom-range" min="0" max="5" style="display:none;">
+      </div>
+    </div>
+
+    <div id="mapcontent">
+      <span id="slideMenu" style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
+    </div>
+  </body>
+</html>
