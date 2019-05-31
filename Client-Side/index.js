@@ -32,7 +32,8 @@ var sliderValues = {
 //Map object
 var mymap;
 var currentSelcted;
-var control;
+var explore;
+var compare;
 var color;
 
 // Array of Options tags for the dropdown/Select tag
@@ -62,7 +63,7 @@ $(document).ready(function() {
 
     // The variables searchboxControl and control determine the options within the filter panel
     var searchboxControl=createSearchboxControl();
-    control = new searchboxControl({
+    explore = new searchboxControl({
         sidebarTitleText: "",
         sidebarMenuItems: {
             Items: [
@@ -94,15 +95,29 @@ $(document).ready(function() {
         }
     });
 
+    compare = new searchboxControl({
+        sidebarTitleText: "Compare",
+        sidebarMenuItems:{
+            Items: [
+                {
+                    type: "search"
+                },
+                {
+                    type: "search"
+                }
+            ]
+        }
+    });
+
     // Onclick search button
-    control._searchfunctionCallBack = function (searchkeywords){
+    explore._searchfunctionCallBack = function (searchkeywords){
         if (!searchkeywords) {
             searchkeywords = "The search call back is clicked !!"
         }
 
         onClickSearch(searchkeywords)
     }
-    mymap.addControl(control);
+    mymap.addControl(explore);
 
     markerLayer = L.layerGroup().addTo(mymap);
 
@@ -446,4 +461,19 @@ function removeLocationOptions() {
     for ( var i = locationList.options.length -1 ; i >= 0 ; i-- ) {
         locationList.remove(i);
     }
+}
+
+
+function openExplore(){
+    alert("Opened explore");
+    mymap.removeControl(compare);
+    mymap.addControl(explore);
+
+}
+
+function openCompare(){
+    alert("Opened compare");
+    mymap.removeControl(explore);
+    mymap.addControl(compare);
+
 }
