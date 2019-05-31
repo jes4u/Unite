@@ -33,6 +33,7 @@ var sliderValues = {
 var mymap;
 var currentSelcted;
 var control;
+var color;
 
 // Array of Options tags for the dropdown/Select tag
 var dropDownOptions = [];
@@ -102,7 +103,7 @@ $(document).ready(function() {
         onClickSearch(searchkeywords)
     }
     mymap.addControl(control);
-  
+
     markerLayer = L.layerGroup().addTo(mymap);
 
 });
@@ -111,17 +112,21 @@ function checkScale() {
   var scale = document.getElementById("scale");
   var value = scale.options[scale.selectedIndex].value;
   if (value == "nation") {
+    color = "blue";
     return "nationpoint.geojson";
   } else if (value == "state") {
+    color = "green";
     return "statepoint.geojson";
   } else if (value == "county") {
+    color = "yellow";
     return "countypoint.geojson";
   } else {
+    color = "violet";
     return "citypoint.geojson";
   }
 }
 
-// This method controls the display of the sliders within the filter panel. 
+// This method controls the display of the sliders within the filter panel.
 //If the checkbox is checked then the slider appears, if it is not checked, the slider disappears
 function activateSlider(element) {
     let checkboxEle = document.getElementById(element + "ID");
@@ -227,6 +232,21 @@ function themeInfo(feature, content){
   return content;
 }
 
+function iconColor() {
+  var scale = document.getElementById("scale");
+  var value = scale.options[scale.selectedIndex].value;
+  var icons = document.getElementsByClassName("leaflet-marker-icon leaflet-zoom-animated leaflet-interactive");
+  setColor(value, icons);
+}
+
+function setColor(value, icons) {
+  if(icons.item(0) != null && icons.item(1) != null) {
+    icons.item(0).src = 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-' + color + ".png";
+    icons.item(1).src = 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-' + color + ".png";
+    console.log(icons.item(0).src);
+  }
+}
+
 // This method is called after the search button is pressed, the method will search through
 //  the geoJSON file and create markers for each location that matches the results
 // If there are no results, an error will appear saying no location has been found
@@ -243,22 +263,23 @@ function onClickSearch(input) {
             }
             if(feature.properties.NAME_2.toString().toLowerCase() == input.toString().toLowerCase()){
                 addMarkerActions(feature);
+                iconColor();
                 foundLocation = true;
                 return true;
             }
             return false;
-        }}) 
+        }})
         if(foundLocation) {
             mymap.fitBounds(search.getBounds())
         } else {
             alert("Location not found... replace with modal popup");
         }
-        
+
     });
 }
 
 // This method is called after the submit button is pressed within the filter panel
-// When called, the method will use the filtered values and search the geoJSON files for 
+// When called, the method will use the filtered values and search the geoJSON files for
 //  locations that fits within the filtered range and will throw and error if there are no
 //  results found
 function searchPopulationPercent() {
@@ -269,14 +290,14 @@ function searchPopulationPercent() {
             alert("Location not selected in the dropdown. Canceling search");
             return;
         }
-        
+
         if (!sliderCheck.carbon && !sliderCheck.gdp && !sliderCheck.population) {
             alert("No filters selected. Canceling search");
             return;
         }
 
         var selectedProperties = markerObject[dropDownValue]._layers[ markerObject[dropDownValue]._leaflet_id - 1 ].feature.properties;
-        
+
         var selectedLocation = {
             population : {
                 name: "population",
@@ -300,13 +321,13 @@ function searchPopulationPercent() {
 
         var foundMatches = false;
         var search;
-        
+
         markerLayer.clearLayers();
         removeLocationOptions();
         dropDownOptions = [];
 
         search = L.geoJson(data, {filter: function(feature) {
-           
+
             //Each if statements calls the same function but changes the ordering of filter options
             if (cycleSelectedFilters(feature, selectedLocation.population, selectedLocation.carbon, selectedLocation.gdp) ){
                 foundMatches = true;
@@ -324,7 +345,7 @@ function searchPopulationPercent() {
         } else {
             alert("No matches found.... replace with modal popup");
         }
-        
+
     });
 }
 
@@ -349,8 +370,8 @@ function cycleSelectedFilters(feature, selection1, selection2, selection3) {
                 } else {
                     return false;
                 }
-                
-            } 
+
+            }
             // Another if statement for gdp
             // if (sliderCheck.gdp) {
             //     if (gdpComparison(feature, selectedGDP, gdpValPercent) ) {
@@ -371,7 +392,7 @@ function cycleSelectedFilters(feature, selection1, selection2, selection3) {
         } else {
             return false;
         }
-    }                                      
+    }
 }
 
 // This method compares the feature with the filter bounds
@@ -384,7 +405,7 @@ function filterComparison(feature, initialAmount, range, type) {
         featureType = feature.properties.CARBON
     } //else type gdp
 
-    if (featureType >= (initialAmount * (1.0 - range)) && 
+    if (featureType >= (initialAmount * (1.0 - range)) &&
         featureType <= (initialAmount * (1.0 + range))){
         return true;
     }
@@ -407,7 +428,7 @@ function addMarkerActions(feature) {
     });
     marker.addTo(markerLayer);
     markerObject[feature.properties.GID_2] = marker
-    marker.on("click", function(event) { 
+    marker.on("click", function(event) {
         document.getElementById("dropDown").selectedIndex = dropDownOptions.indexOf(event.layer.feature.properties.GID_2 + "");
 //>>>>>>> master conflict started on line 291
     });
