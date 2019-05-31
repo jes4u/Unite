@@ -31,7 +31,9 @@ html, body, #mapid {
     width: 100%;
 }
 
-
+.leaflet-popup-content-wrapper, .leaflet-popup-tip {
+  background: rgb(255, 211, 0);
+}
 
 .hidden {
     display: none;
