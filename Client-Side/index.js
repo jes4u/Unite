@@ -108,19 +108,17 @@ function activateSlider(element) {
 }
 
 function updateSliderValue(element, value) {
-    values[element] = value
+    values[element] = value;
+    console.log(element + ":  " + value);
     let valEle= "value" + element;
     document.getElementById(valEle).innerHTML = "Value: " + value;
 }
 
-function popupContent(feature) {
+function popupContent(feature, title) {
+
     var content = document.createElement("div");
-    var country = document.createElement("p");
-    country.innerHTML = "Country: " + feature.properties.NAME_0;
-    var city = document.createElement("p");
-    city.innerHTML = "City/Province: " + feature.properties.NAME_1;
-    var county = document.createElement("p");
-    county.innerHTML = "County: " + feature.properties.NAME_2;
+    var head = document.createElement("p");
+    head.innerHTML = title;
     var population = document.createElement("p");
     population.innerHTML = "Population: " + feature.properties.POPULATION;
     var popDensity = document.createElement("p");
@@ -131,11 +129,10 @@ function popupContent(feature) {
     perCapCarbon.innerHTML = "Carbon Emission per Capita: " + feature.properties.PERCAPCARB;
 
     var link = document.createElement("a");
-    link.href = "http://www.google.com/search?q=" + feature.properties.NAME_0 + "+" + feature.properties.NAME_1 + "+" + feature.properties.NAME_2;
+    link.href = "http://www.google.com/search?q=" + title.split(": ")[1];
+    link.target = "_blank";
     link.innerHTML = "Search for more information!";
-    content.appendChild(country);
-    content.appendChild(city);
-    content.appendChild(county);
+    content.appendChild(head);
     content.appendChild(population);
     content.appendChild(popDensity);
     content.appendChild(carbon);
@@ -146,17 +143,17 @@ function popupContent(feature) {
   }
 
 function onClickSearch(input) {
-    $.getJSON('./Data/GeoJSONFiles/countypoint.geojson', function(data){
+    $.getJSON('./Data/GeoJSONFiles/allpoint.geojson', function(data){
         var search;
         var foundLocation = false;
         markerLayer.clearLayers();
         removeLocationOptions();
         dropDownOptions = []
         search = L.geoJson(data, {filter: function(feature) {
-            if (feature.properties.NAME_2 == null) {
+            if (feature.properties.UNINAME.split(" ").length == 1) {
                 return false;
             }
-            if(feature.properties.NAME_2.toString().toLowerCase() == input.toString().toLowerCase()){
+            if (feature.properties.UNINAME.toString().toLowerCase().includes(input.toString().toLowerCase())){
                 addMarkerActions(feature);
                 foundLocation = true;
                 return true;
@@ -183,7 +180,7 @@ function searchPopulationPercent() {
         var carbonValPercent = values.carbon / 100;
         var gdpValPercent = values.gdp / 100;
         var selctedPopulation = markerObject[dropDownValue]._layers[ markerObject[dropDownValue]._leaflet_id - 1 ].feature.properties.POPULATION;
-        var marker_HASC_2 = markerObject[dropDownValue]._layers[ markerObject[dropDownValue]._leaflet_id - 1 ].feature.properties.HASC_2;
+        var marker_ORIG_FID = markerObject[dropDownValue]._layers[ markerObject[dropDownValue]._leaflet_id - 1 ].feature.properties.ORIG_FID;
         var foundMatches = false;
         var search;
         
@@ -194,7 +191,7 @@ function searchPopulationPercent() {
             
             if (((feature.properties.POPULATION > (selctedPopulation * (1.0 - popValPercent)) && 
                 feature.properties.POPULATION < (selctedPopulation * (1.0 + popValPercent)))) || 
-                feature.properties.HASC_2 == marker_HASC_2) 
+                feature.properties.ORIG_FID == marker_ORIG_FID) 
             {
                 foundMatches = true;
                 addMarkerActions(feature);
@@ -214,17 +211,36 @@ function searchPopulationPercent() {
 }
 
 function addMarkerActions(feature) {
-    var content = popupContent(feature);
+    var title;
+    switch(feature.properties.UNITTYPE) {
+        case "STATE":
+            title = "State:  " + feature.properties.NAME_1 + ", " + feature.properties.NAME_0;
+            break;
+        case "COUNTY":
+            title = "County:  " + feature.properties.NAME_2 + ", " 
+                    + feature.properties.NAME_1 + ", " + feature.properties.NAME_0;
+            break;
+        case "NATION":
+            title = "Nation:  " + feature.properties.NAME;
+            break;
+        case "URBANEXTENT":
+            title = "Urban Extent:  " + feature.properties.NAME + ", " + feature.properties.ISO3;
+            break;
+        default:
+            title = feature.properties.UNITTYPE;
+            break;
+    }
+    var content = popupContent(feature, title);
     var dropDown = document.getElementById("dropDown");
     var option = document.createElement("option");
-    option.value = feature.properties.GID_2;
-    dropDownOptions.push(feature.properties.GID_2 + "");
-    option.innerHTML = feature.properties.NAME_2 + " County " + feature.properties.NAME_1 + ", " + feature.properties.NAME_0;
+    option.value = feature.properties.ORIG_FID;
+    dropDownOptions.push(feature.properties.ORIG_FID + "");
+    option.innerHTML = title;
     dropDown.appendChild(option);
     var marker = L.geoJson(feature).bindPopup(content).addTo(markerLayer);
-    markerObject[feature.properties.GID_2] = marker
+    markerObject[feature.properties.ORIG_FID] = marker
     marker.on("click", function(event) { 
-        document.getElementById("dropDown").selectedIndex = dropDownOptions.indexOf(event.layer.feature.properties.GID_2 + "");
+        document.getElementById("dropDown").selectedIndex = dropDownOptions.indexOf(event.layer.feature.properties.ORIG_FID + "");
     });
 }
 
