@@ -108,23 +108,6 @@ $(document).ready(function() {
 
 });
 
-function checkScale() {
-  var scale = document.getElementById("scale");
-  var value = scale.options[scale.selectedIndex].value;
-  if (value == "nation") {
-    color = "blue";
-    return "nationpoint.geojson";
-  } else if (value == "state") {
-    color = "green";
-    return "statepoint.geojson";
-  } else if (value == "county") {
-    color = "yellow";
-    return "countypoint.geojson";
-  } else {
-    color = "violet";
-    return "citypoint.geojson";
-  }
-}
 
 // This method controls the display of the sliders within the filter panel.
 //If the checkbox is checked then the slider appears, if it is not checked, the slider disappears
@@ -145,35 +128,21 @@ function activateSlider(element) {
 
 // This method constantly updates the display for current slider value everytime the slider changes value
 function updateSliderValue(element, value) {
-    values[element] = value
+    values[element] = value;
+    console.log(element + ":  " + value);
     let valEle= "value" + element;
     document.getElementById(valEle).innerHTML = "Value: " + value;
 }
 
-//This method displays all the texts with each marker
-function popupContent(feature) {
+
+function popupContent(feature, title) {
+
     var content = document.createElement("div");
-    var country = document.createElement("p");
-    country.innerHTML = "Country: " + feature.properties.NAME_0;
-    country.value = feature.properties.NAME_0;
-    country.style.display = "none";
-    var state = document.createElement("p");
-    state.innerHTML = "State: " + feature.properties.NAME_1;
-    state.value = feature.properties.NAME_1;
-    state.style.display = "none";
-    var county = document.createElement("p");
-    county.innerHTML = "County: " + feature.properties.NAME_2;
-    county.value = feature.properties.NAME_2 + " County";
-    county.style.display = "none";
-    var city = document.createElement("p");
-    city.innerHTML = "City: " + feature.properties.NAME_3;
-    city.value = feature.properties.NAME_3;
-    city.style.display = "none";
+    var head = document.createElement("p");
+    head.innerHTML = title;
+    head.style.display = "none";
     var link = document.createElement("a");
-    content.appendChild(country);
-    content.appendChild(state);
-    content.appendChild(county);
-    content.appendChild(city);
+    content.appendChild(head);
     content = themeInfo(feature, content);
     var keyword = "";
     keyword += scaleInfo(content, keyword);
@@ -235,6 +204,15 @@ function themeInfo(feature, content){
 function iconColor() {
   var scale = document.getElementById("scale");
   var value = scale.options[scale.selectedIndex].value;
+  if (value == "nation") {
+    color = "blue";
+  } else if (value == "state") {
+    color = "green";
+  } else if (value == "county") {
+    color = "yellow";
+  } else {
+    color = "violet";
+  }
   var icons = document.getElementsByClassName("leaflet-marker-icon leaflet-zoom-animated leaflet-interactive");
   setColor(value, icons);
 }
@@ -251,17 +229,17 @@ function setColor(value, icons) {
 //  the geoJSON file and create markers for each location that matches the results
 // If there are no results, an error will appear saying no location has been found
 function onClickSearch(input) {
-    $.getJSON("/Data/GeoJSONFiles/" + checkScale(), function(data){
+    $.getJSON('./Data/GeoJSONFiles/allpoint.geojson', function(data){
         var search;
         var foundLocation = false;
         markerLayer.clearLayers();
         removeLocationOptions();
         dropDownOptions = [];
         search = L.geoJson(data, {filter: function(feature) {
-            if (feature.properties.NAME_2 == null) {
+            if (feature.properties.UNINAME.split(" ").length == 1) {
                 return false;
             }
-            if(feature.properties.NAME_2.toString().toLowerCase() == input.toString().toLowerCase()){
+            if (feature.properties.UNINAME.toString().toLowerCase().includes(input.toString().toLowerCase())){
                 addMarkerActions(feature);
                 iconColor();
                 foundLocation = true;
@@ -283,8 +261,7 @@ function onClickSearch(input) {
 //  locations that fits within the filtered range and will throw and error if there are no
 //  results found
 function searchPopulationPercent() {
-    $.getJSON("/Data/GeoJSONFiles/" + checkScale(), function(data){
-    //$.getJSON('./Data/GeoJSONFiles/countypoint.geojson', function(data){
+    $.getJSON("/Data/GeoJSONFiles/allpoint.geojson", function(data){
         var dropDownValue = document.getElementById("dropDown").value;
         if (dropDownValue === "") {
             alert("Location not selected in the dropdown. Canceling search");
@@ -415,21 +392,40 @@ function filterComparison(feature, initialAmount, range, type) {
 // This method adds each location found into the dropdown option and adds the location marker into the
 //  marker group layer.
 function addMarkerActions(feature) {
-    var content = popupContent(feature);
+    var title;
+    switch(feature.properties.UNITTYPE) {
+        case "STATE":
+            title = "State:  " + feature.properties.NAME_1 + ", " + feature.properties.NAME_0;
+            break;
+        case "COUNTY":
+            title = "County:  " + feature.properties.NAME_2 + ", " 
+                    + feature.properties.NAME_1 + ", " + feature.properties.NAME_0;
+            break;
+        case "NATION":
+            title = "Nation:  " + feature.properties.NAME;
+            break;
+        case "URBANEXTENT":
+            title = "Urban Extent:  " + feature.properties.NAME + ", " + feature.properties.ISO3;
+            break;
+        default:
+            title = feature.properties.UNITTYPE;
+            break;
+    }
+    var content = popupContent(feature, title);
     var dropDown = document.getElementById("dropDown");
     var option = document.createElement("option");
-    option.value = feature.properties.GID_2;
-    dropDownOptions.push(feature.properties.GID_2 + "");
-    option.innerHTML = feature.properties.NAME_2 + " County " + feature.properties.NAME_1 + ", " + feature.properties.NAME_0;
+    option.value = feature.properties.ORIG_FID;
+    dropDownOptions.push(feature.properties.ORIG_FID + "");
+    option.innerHTML = title;
     dropDown.appendChild(option);
     var marker = L.geoJson(feature).bindPopup(content)//.addTo(markerLayer);
     marker.setStyle({
         fillColor: 'white'
     });
     marker.addTo(markerLayer);
-    markerObject[feature.properties.GID_2] = marker
+    markerObject[feature.properties.ORIG_FID] = marker
     marker.on("click", function(event) {
-        document.getElementById("dropDown").selectedIndex = dropDownOptions.indexOf(event.layer.feature.properties.GID_2 + "");
+        document.getElementById("dropDown").selectedIndex = dropDownOptions.indexOf(event.layer.feature.properties.ORIG_FID + "");
 //>>>>>>> master conflict started on line 291
     });
 }
