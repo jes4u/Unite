@@ -105,3 +105,8 @@ input[type=submit] {
     position: relative;
     width: 80%;
 }
+
+.compareSearch {
+    align-items: center;
+    justify-content: center
+}
