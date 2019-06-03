@@ -504,11 +504,7 @@ function removeLocationOptions() {
 }
 
 function searchCompare() {
-
-    console.log(compare1 + " " +  compare2)
     var searchIDs = document.getElementsByClassName("searchID")
-    console.log(searchIDs)
-    console.log(document.getElementById("compare1").value)
 
     $.getJSON('./Data/GeoJSONFiles/allpoint.geojson', function (data) {
         var search;
@@ -519,7 +515,6 @@ function searchCompare() {
                     return false;
                 }
                 if (feature.properties.ORIG_FID == compare1 || feature.properties.ORIG_FID == compare2) {
-                    //console.log(value)
                     addMarkerActions(feature);
                     foundLocation = true;
                     return true;
@@ -579,7 +574,7 @@ function scaleSelection(compareSearch, scale) {
         autocomplete(document.getElementById(compareSearch), stateList, compareSearch);
     } else if (scale == "county") {
         autocomplete(document.getElementById(compareSearch), countyList, compareSearch);
-    } else if (scale == "city") {
+    } else if (scale == "urbanextent") {
         autocomplete(document.getElementById(compareSearch), cityList, compareSearch);
     }
 }
