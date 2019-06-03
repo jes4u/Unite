@@ -515,6 +515,10 @@ function searchCompare() {
                     return false;
                 }
                 if (feature.properties.ORIG_FID == compare1 || feature.properties.ORIG_FID == compare2) {
+                    if (!foundLocation) {
+                        markerLayer.clearLayers();
+                    }
+
                     addMarkerActions(feature);
                     foundLocation = true;
                     return true;
