@@ -96,3 +96,12 @@ input[type=submit] {
   background-color: DodgerBlue !important; 
   color: #ffffff; 
 }
+
+.autocomplete {
+    width: 80%;
+}
+
+.divSelectSearch, select {
+    position: relative;
+    width: 80%;
+}
