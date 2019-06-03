@@ -23,7 +23,9 @@ var sliderValues = {
         min: 0,
         max: 20
     },
-    carbon: {
+
+    carbon : {
+
         min: 0,
         max: 20
     }
@@ -32,6 +34,7 @@ var sliderValues = {
 //Map object
 var mymap;
 var currentSelcted;
+
 var explore;
 var compare;
 var color;
@@ -75,6 +78,7 @@ $(document).ready(function () {
     // The variables searchboxControl and control determine the options within the filter panel
     var searchboxControl = createSearchboxControl();
     explore = new searchboxControl({
+
         sidebarTitleText: "",
         sidebarMenuItems: {
             Items: [
@@ -105,6 +109,7 @@ $(document).ready(function () {
             ]
         }
     });
+
 
     compare = new searchboxControl({
         sidebarTitleText: "Compare",
@@ -203,6 +208,7 @@ function popupContent(feature, title) {
     // keyword += themeKeyword();
     link.href = "http://www.google.com/search?q=" + title.split(": ")[1];
     link.innerHTML = "Search for more information!";
+
     link.target = "_blank";
     content.appendChild(link);
     currentSelcted = feature;
@@ -268,6 +274,7 @@ function onClickSearch(input) {
         removeLocationOptions();
         dropDownOptions = [];
         var value = 0;
+
         var scale = document.getElementById("scale").options[document.getElementById("scale")
                 .selectedIndex].value.toUpperCase();
         search = L.geoJson(data, {filter: function(feature) {
@@ -288,6 +295,7 @@ function onClickSearch(input) {
             return false;
         }})
         if(foundLocation) {
+
             mymap.fitBounds(search.getBounds());
         } else {
             alert("Location not found... replace with modal popup");
@@ -301,6 +309,7 @@ function onClickSearch(input) {
 //  locations that fits within the filtered range and will throw and error if there are no
 //  results found
 function searchPopulationPercent() {
+
     $.getJSON("/Data/GeoJSONFiles/allpoint.geojson", function (data) {
         var dropDownValue = document.getElementById("dropDown").value;
         if (dropDownValue === "") {
@@ -689,4 +698,18 @@ function autocomplete(inp, arr, compareSearch) {
     document.addEventListener("click", function (e) {
         closeAllLists(e.target);
     });
+    marker.addTo(markerLayer);
+    markerObject[feature.properties.ORIG_FID] = marker;
+    marker.on("click", function(event) {
+        document.getElementById("dropDown").selectedIndex = dropDownOptions.indexOf(event.layer.feature.properties.ORIG_FID + "");
+//>>>>>>> master conflict started on line 291
+    });
+}
+
+// This method removes all the options within the dropdown list
+function removeLocationOptions() {
+    var locationList = document.getElementById("dropDown");
+    for ( var i = locationList.options.length -1 ; i >= 0 ; i-- ) {
+        locationList.remove(i);
+    }
 }
