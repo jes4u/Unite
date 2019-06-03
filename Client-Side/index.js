@@ -510,9 +510,12 @@ function addMarkerActions(feature) {
     });
     marker.addTo(markerLayer);
     markerObject[feature.properties.ORIG_FID] = marker;
-    marker.on("click", function (event) {
-        document.getElementById("dropDown").selectedIndex = dropDownOptions.indexOf(event.layer.feature.properties.ORIG_FID + "");
-    });
+    if (!isOnCompare){
+        marker.on("click", function (event) {
+            document.getElementById("dropDown").selectedIndex = dropDownOptions.indexOf(event.layer.feature.properties.ORIG_FID + "");
+        });
+    }
+    
 }
 
 // This method removes all the options within the dropdown list
@@ -529,6 +532,9 @@ function removeLocationOptions() {
 function searchCompare() {
 
     console.log(compare1 + " " +  compare2)
+    var searchIDs = document.getElementsByClassName("searchID")
+    console.log(searchIDs)
+    console.log(document.getElementById("compare1").value)
 
     $.getJSON('./Data/GeoJSONFiles/allpoint.geojson', function (data) {
         var search;
@@ -637,14 +643,16 @@ function autocomplete(inp, arr, compareSearch) {
                 b.innerHTML += location.substr(val.length);
                 /*insert a input field that will hold the current array item's value:*/
                 b.innerHTML += "<input type='hidden' value='" + location + "'>";
+                b.innerHTML += '<input type="hidden" value="' + idLocation + '">';
                 /*execute a function when someone clicks on the item value (DIV element):*/
                 b.addEventListener("click", function (e) {
                     /*insert the value for the autocomplete text field:*/
                     inp.value = this.getElementsByTagName("input")[0].value;
+
                     if (compareSearch == "compare1") {
-                        compare1 = idLocation
+                        compare1 =  this.getElementsByTagName("input")[1].value;
                     } else {
-                        compare2 = idLocation
+                        compare2 =  this.getElementsByTagName("input")[1].value;
                     }
                     /*close the list of autocompleted values,
                     (or any other open lists of autocompleted values:*/
