@@ -521,7 +521,6 @@ function searchCompare() {
                 if (feature.properties.ORIG_FID == compare1 || feature.properties.ORIG_FID == compare2) {
                     //console.log(value)
                     addMarkerActions(feature);
-                    iconColor();
                     foundLocation = true;
                     return true;
                 }
