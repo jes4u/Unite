@@ -49,6 +49,11 @@ var countyList = [];
 var nationList = [];
 var stateList = [];
 
+var isOnCompare = false;
+var compare1;
+var compare2;
+
+
 $(document).ready(function () {
 
 
@@ -178,7 +183,7 @@ function activateSlider(element) {
 // This method constantly updates the display for current slider value everytime the slider changes value
 function updateSliderValue(element, value) {
     values[element] = value;
-    console.log(element + ":  " + value);
+    //console.log(element + ":  " + value);
     let valEle = "value" + element;
     document.getElementById(valEle).innerHTML = "Value: " + value;
 }
@@ -230,10 +235,11 @@ function themeKeyword() {
 }
 
 function themeInfo(feature, content) {
-    if (document.getElementById("gdpID").checked) {
+
+    if (isOnCompare || document.getElementById("gdpID").checked) {
         // gdp to be added
     }
-    if (document.getElementById("populationID").checked) {
+    if (isOnCompare || document.getElementById("populationID").checked) {
         var population = document.createElement("p");
         population.innerHTML = "Population: " + feature.properties.POPULATION;
         var popDensity = document.createElement("p");
@@ -241,7 +247,7 @@ function themeInfo(feature, content) {
         content.appendChild(population);
         content.appendChild(popDensity);
     }
-    if (document.getElementById("carbonID").checked) {
+    if (isOnCompare || document.getElementById("carbonID").checked) {
         var carbon = document.createElement("p");
         carbon.innerHTML = "Carbon Emission Level: " + feature.properties.CARBON;
         var perCapCarbon = document.createElement("p");
@@ -255,7 +261,13 @@ function themeInfo(feature, content) {
 
 function iconColor() {
     var scale = document.getElementById("scale");
-    var value = scale.options[scale.selectedIndex].value;
+    var value; 
+    if (isOnCompare) {
+        console.log("need to add color for iconcolor() line 262")
+        value = "nation"
+    } else {
+        scale.options[scale.selectedIndex].value;
+    }
     if (value == "nation") {
         color = "blue";
     } else if (value == "state") {
@@ -300,7 +312,6 @@ function onClickSearch(input) {
                         + feature.properties.ISO3).toLowerCase().includes(word);
                 });
                 if (value == input.toString().split(" ").length) {
-                    console.log(value)
                     addMarkerActions(feature);
                     iconColor();
                     foundLocation = true;
@@ -490,7 +501,9 @@ function addMarkerActions(feature) {
     option.value = feature.properties.ORIG_FID;
     dropDownOptions.push(feature.properties.ORIG_FID + "");
     option.innerHTML = title;
-    dropDown.appendChild(option);
+    if(!isOnCompare){
+        dropDown.appendChild(option);
+    }
     var marker = L.geoJson(feature).bindPopup(content);//.addTo(markerLayer);
     marker.setStyle({
         fillColor: 'white'
@@ -514,29 +527,19 @@ function removeLocationOptions() {
 }
 
 function searchCompare() {
-    var compare1 = document.getElementById("compare1").value;
-    var compare2 = document.getElementById("compare2").value;
+
+    console.log(compare1 + " " +  compare2)
 
     $.getJSON('./Data/GeoJSONFiles/allpoint.geojson', function (data) {
         var search;
-        //var foundLocation = false;
-        //markerLayer.clearLayers();
-        //removeLocationOptions();
-        //dropDownOptions = [];
-        var value = 0;
+        var foundLocation = false;
         search = L.geoJson(data, {
             filter: function (feature) {
                 if (feature.properties.UNINAME.split(" ").length == 1) {
                     return false;
                 }
-                value = 0;
-                (input.toString().toLowerCase().split(" ")).forEach(function (word) {
-                    value += (feature.properties.UNINAME.toString() + feature.properties.NAME
-                        + feature.properties.NAME_0 + feature.properties.NAME_1 + feature.properties.NAME_2
-                        + feature.properties.ISO3).toLowerCase().includes(word);
-                });
-                if (value == input.toString().split(" ").length) {
-                    console.log(value)
+                if (feature.properties.ORIG_FID == compare1 || feature.properties.ORIG_FID == compare2) {
+                    //console.log(value)
                     addMarkerActions(feature);
                     iconColor();
                     foundLocation = true;
@@ -556,6 +559,7 @@ function searchCompare() {
 
 function openExplore() {
     mymap.removeControl(compare);
+    isOnCompare = false;
     mymap.addControl(explore);
     $(".panel").toggle();
     document.getElementById("controlbox").classList.add("hidden");
@@ -569,6 +573,7 @@ function openCompare() {
     removeLocationOptions();
     dropDownOptions = [];
     mymap.removeControl(explore);
+    isOnCompare = true;
     mymap.addControl(compare);
     $(".panel").toggle(function () {
         autocomplete(document.getElementById("compare1"), nationList);
@@ -590,19 +595,19 @@ function openCompare() {
 
 function scaleSelection(compareSearch, scale) {
     if (scale == "nation") {
-        autocomplete(document.getElementById("compare1"), nationList);
+        autocomplete(document.getElementById(compareSearch), nationList, compareSearch);
     } else if (scale == "state") {
-        autocomplete(document.getElementById("compare1"), stateList);
+        autocomplete(document.getElementById(compareSearch), stateList, compareSearch);
     } else if (scale == "county") {
-        autocomplete(document.getElementById("compare1"), countyList);
+        autocomplete(document.getElementById(compareSearch), countyList, compareSearch);
     } else if (scale == "city") {
-        autocomplete(document.getElementById("compare1"), cityList);
+        autocomplete(document.getElementById(compareSearch), cityList, compareSearch);
     }
 }
 
 
 // Source: https://www.w3schools.com/howto/howto_js_autocomplete.asp 
-function autocomplete(inp, arr) {
+function autocomplete(inp, arr, compareSearch) {
     /*the autocomplete function takes two arguments,
     the text field element and an array of possible autocompleted values:*/
     var currentFocus;
@@ -622,6 +627,7 @@ function autocomplete(inp, arr) {
         /*for each item in the array...*/
         for (i = 0; i < arr.length; i++) {
             var location = arr[i].substr(0, arr[i].lastIndexOf(" "));
+            var idLocation = arr[i].substr(arr[i].lastIndexOf(" ") + 1, arr[i].length)
             /*check if the item starts with the same letters as the text field value:*/
             if (location.substr(0, val.length).toUpperCase() == val.toUpperCase()) {
                 /*create a DIV element for each matching element:*/
@@ -635,6 +641,11 @@ function autocomplete(inp, arr) {
                 b.addEventListener("click", function (e) {
                     /*insert the value for the autocomplete text field:*/
                     inp.value = this.getElementsByTagName("input")[0].value;
+                    if (compareSearch == "compare1") {
+                        compare1 = idLocation
+                    } else {
+                        compare2 = idLocation
+                    }
                     /*close the list of autocompleted values,
                     (or any other open lists of autocompleted values:*/
                     closeAllLists();
