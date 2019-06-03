@@ -582,8 +582,8 @@ function openCompare() {
     isOnCompare = true;
     mymap.addControl(compare);
     $(".panel").toggle(function () {
-        autocomplete(document.getElementById("compare1"), nationList);
-        autocomplete(document.getElementById("compare2"), nationList);
+        autocomplete(document.getElementById("compare1"), nationList, "compare1");
+        autocomplete(document.getElementById("compare2"), nationList, "compare2");
 
         $("#scale0").change(function() {
             var scaleVal = document.getElementById("scale0").value;
