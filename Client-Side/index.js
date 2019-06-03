@@ -129,7 +129,6 @@ function activateSlider(element) {
 // This method constantly updates the display for current slider value everytime the slider changes value
 function updateSliderValue(element, value) {
     values[element] = value;
-    console.log(element + ":  " + value);
     let valEle= "value" + element;
     document.getElementById(valEle).innerHTML = "Value: " + value;
 }
@@ -140,7 +139,6 @@ function popupContent(feature, title) {
     var content = document.createElement("div");
     var head = document.createElement("p");
     head.innerHTML = title;
-    console.log(title);
     var link = document.createElement("a");
     content.appendChild(head);
     content = themeInfo(feature, content);
@@ -204,30 +202,6 @@ function themeInfo(feature, content){
   return content;
 }
 
-function iconColor() {
-  var scale = document.getElementById("scale");
-  var value = scale.options[scale.selectedIndex].value;
-  if (value == "nation") {
-    color = "blue";
-  } else if (value == "state") {
-    color = "green";
-  } else if (value == "county") {
-    color = "yellow";
-  } else {
-    color = "violet";
-  }
-  var icons = document.getElementsByClassName("leaflet-marker-icon leaflet-zoom-animated leaflet-interactive");
-  setColor(value, icons);
-}
-
-function setColor(value, icons) {
-  if(icons.item(0) != null && icons.item(1) != null) {
-    icons.item(0).src = 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-' + color + ".png";
-    icons.item(1).src = 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-' + color + ".png";
-    console.log(icons.item(0).src);
-  }
-}
-
 // This method is called after the search button is pressed, the method will search through
 //  the geoJSON file and create markers for each location that matches the results
 // If there are no results, an error will appear saying no location has been found
@@ -239,8 +213,10 @@ function onClickSearch(input) {
         removeLocationOptions();
         dropDownOptions = [];
         var value = 0;
+        var scale = document.getElementById("scale").options[document.getElementById("scale")
+                .selectedIndex].value.toUpperCase();
         search = L.geoJson(data, {filter: function(feature) {
-            if (feature.properties.UNINAME.split(" ").length == 1) {
+            if (feature.properties.UNITTYPE != scale || feature.properties.UNINAME.split(" ").length == 1) {
                 return false;
             }
             value = 0;
@@ -251,14 +227,14 @@ function onClickSearch(input) {
             });
             if (value == input.toString().split(" ").length){
                 addMarkerActions(feature);
-                iconColor();
+                //iconColor();
                 foundLocation = true;
                 return true;
             }
             return false;
         }})
         if(foundLocation) {
-            mymap.fitBounds(search.getBounds())
+            mymap.fitBounds(search.getBounds());
         } else {
             alert("Location not found... replace with modal popup");
         }
@@ -406,16 +382,20 @@ function addMarkerActions(feature) {
     switch(feature.properties.UNITTYPE) {
         case "STATE":
             title = "State:  " + feature.properties.NAME_1 + ", " + feature.properties.NAME_0;
+            color = "green";
             break;
         case "COUNTY":
             title = "County:  " + feature.properties.NAME_2 + ", " 
                     + feature.properties.NAME_1 + ", " + feature.properties.NAME_0;
+            color = "yellow";
             break;
         case "NATION":
             title = "Nation:  " + feature.properties.NAME;
+            color = "blue";
             break;
         case "URBANEXTENT":
             title = "Urban Extent:  " + feature.properties.NAME + ", " + feature.properties.ISO3;
+            color = "violet";
             break;
         default:
             title = feature.properties.UNITTYPE;
@@ -436,8 +416,11 @@ function addMarkerActions(feature) {
     markerObject[feature.properties.ORIG_FID] = marker;
     marker.on("click", function(event) {
         document.getElementById("dropDown").selectedIndex = dropDownOptions.indexOf(event.layer.feature.properties.ORIG_FID + "");
-//>>>>>>> master conflict started on line 291
     });
+    // Because changing color also makes use of the 'feature' object and the switch statement,
+    // I joined it with the pop-up function
+    document.getElementsByClassName("leaflet-pane leaflet-marker-pane")[0].lastChild.src = 
+            'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-' + color + ".png";
 }
 
 // This method removes all the options within the dropdown list
