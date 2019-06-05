@@ -270,23 +270,25 @@ function onClickSearch(input) {
         var value = 0;
         var scale = document.getElementById("scale").options[document.getElementById("scale")
                 .selectedIndex].value.toUpperCase();
-        search = L.geoJson(data, {filter: function(feature) {
-            if (feature.properties.UNITTYPE != scale || feature.properties.UNINAME.split(" ").length == 1) {
+        search = L.geoJson(data, {
+            filter: function(feature) {
+                if (feature.properties.UNITTYPE != scale || feature.properties.UNINAME.split(" ").length == 1) {
+                    return false;
+                }
+                value = 0;
+                (input.toString().toLowerCase().split(" ")).forEach(function(word){
+                    value += (feature.properties.UNINAME.toString() + feature.properties.NAME 
+                            + feature.properties.NAME_0 + feature.properties.NAME_1 + feature.properties.NAME_2 
+                            + feature.properties.ISO3).toLowerCase().includes(word);
+                });
+                if (value == input.toString().split(" ").length){
+                    addMarkerActions(feature);
+                    foundLocation = true;
+                    return true;
+                }
                 return false;
             }
-            value = 0;
-            (input.toString().toLowerCase().split(" ")).forEach(function(word){
-                value += (feature.properties.UNINAME.toString() + feature.properties.NAME 
-                        + feature.properties.NAME_0 + feature.properties.NAME_1 + feature.properties.NAME_2 
-                        + feature.properties.ISO3).toLowerCase().includes(word);
-            });
-            if (value == input.toString().split(" ").length){
-                addMarkerActions(feature);
-                foundLocation = true;
-                return true;
-            }
-            return false;
-        }})
+        });
         if(foundLocation) {
             mymap.fitBounds(search.getBounds());
         } else {
@@ -432,9 +434,9 @@ function filterComparison(feature, initialAmount, range, type) {
     } else /* if (type == "carbon") */ {
         featureType = feature.properties.CARBON;
     } //else type gdp
-
+     
     if (featureType >= (initialAmount * (1.0 - range)) &&
-        featureType <= (initialAmount * (1.0 + range))) {
+        featureType <= (initialAmount * (1.0 + range))) { 
         return true;
     }
     return false;
@@ -488,8 +490,12 @@ function addMarkerActions(feature) {
     }
     // Because changing color also makes use of the 'feature' object and the switch statement,
     // I joined it with the pop-up function
-    document.getElementsByClassName("leaflet-pane leaflet-marker-pane")[0].lastChild.src = 
-            'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-' + color + ".png";
+    var thisMarker = document.getElementsByClassName("leaflet-pane leaflet-marker-pane")[0];
+    thisMarker.lastChild.src = 
+            'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-' + color + ".png"; 
+    var dropDownValue = document.getElementById("dropDown").value;
+    var pop = markerObject[dropDownValue]._layers[markerObject[dropDownValue]._leaflet_id - 1].feature.properties.POPULATION;
+    thisMarker.lastChild.style.opacity = 1 - 0.8 * (Math.abs(feature.properties.POPULATION - pop) / (0.2 * pop)); 
 }
 
 // This method removes all the options within the dropdown list
