@@ -303,7 +303,7 @@ function onClickSearch(input) {
 //  locations that fits within the filtered range and will throw and error if there are no
 //  results found
 function searchPopulationPercent() {
-    $.getJSON("/Data/GeoJSONFiles/allpoint.geojson", function (data) {
+    $.getJSON("./Data/GeoJSONFiles/allpoint.geojson", function (data) {
         var dropDownValue = document.getElementById("dropDown").value;
         if (dropDownValue === "") {
             alert("Location not selected in the dropdown. Canceling search");
@@ -493,9 +493,9 @@ function addMarkerActions(feature) {
     var thisMarker = document.getElementsByClassName("leaflet-pane leaflet-marker-pane")[0];
     thisMarker.lastChild.src = 
             'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-' + color + ".png"; 
-    var dropDownValue = document.getElementById("dropDown").value;
-    var pop = markerObject[dropDownValue]._layers[markerObject[dropDownValue]._leaflet_id - 1].feature.properties.POPULATION;
-    thisMarker.lastChild.style.opacity = 1 - 0.8 * (Math.abs(feature.properties.POPULATION - pop) / (0.2 * pop)); 
+    // var dropDownValue = document.getElementById("dropDown").value;
+    // var pop = markerObject[dropDownValue]._layers[markerObject[dropDownValue]._leaflet_id - 1].feature.properties.POPULATION;
+    // thisMarker.lastChild.style.opacity = 1 - 0.8 * (Math.abs(feature.properties.POPULATION - pop) / (0.2 * pop)); 
 }
 
 // This method removes all the options within the dropdown list
