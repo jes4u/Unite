@@ -23,9 +23,7 @@ var sliderValues = {
         min: 0,
         max: 20
     },
-
-    carbon : {
-
+    carbon: {
         min: 0,
         max: 20
     }
@@ -34,7 +32,6 @@ var sliderValues = {
 //Map object
 var mymap;
 var currentSelcted;
-
 var explore;
 var compare;
 var color;
@@ -78,7 +75,6 @@ $(document).ready(function () {
     // The variables searchboxControl and control determine the options within the filter panel
     var searchboxControl = createSearchboxControl();
     explore = new searchboxControl({
-
         sidebarTitleText: "",
         sidebarMenuItems: {
             Items: [
@@ -109,7 +105,6 @@ $(document).ready(function () {
             ]
         }
     });
-
 
     compare = new searchboxControl({
         sidebarTitleText: "Compare",
@@ -208,7 +203,6 @@ function popupContent(feature, title) {
     // keyword += themeKeyword();
     link.href = "http://www.google.com/search?q=" + title.split(": ")[1];
     link.innerHTML = "Search for more information!";
-
     link.target = "_blank";
     content.appendChild(link);
     currentSelcted = feature;
@@ -274,30 +268,26 @@ function onClickSearch(input) {
         removeLocationOptions();
         dropDownOptions = [];
         var value = 0;
-
         var scale = document.getElementById("scale").options[document.getElementById("scale")
                 .selectedIndex].value.toUpperCase();
-        search = L.geoJson(data, {
-            filter: function(feature) {
-                if (feature.properties.UNITTYPE != scale || feature.properties.UNINAME.split(" ").length == 1) {
-                    return false;
-                }
-                value = 0;
-                (input.toString().toLowerCase().split(" ")).forEach(function(word){
-                    value += (feature.properties.UNINAME.toString() + feature.properties.NAME 
-                            + feature.properties.NAME_0 + feature.properties.NAME_1 + feature.properties.NAME_2 
-                            + feature.properties.ISO3).toLowerCase().includes(word);
-                });
-                if (value == input.toString().split(" ").length){
-                    addMarkerActions(feature);
-                    foundLocation = true;
-                    return true;
-                }
+        search = L.geoJson(data, {filter: function(feature) {
+            if (feature.properties.UNITTYPE != scale || feature.properties.UNINAME.split(" ").length == 1) {
                 return false;
             }
-        });
+            value = 0;
+            (input.toString().toLowerCase().split(" ")).forEach(function(word){
+                value += (feature.properties.UNINAME.toString() + feature.properties.NAME 
+                        + feature.properties.NAME_0 + feature.properties.NAME_1 + feature.properties.NAME_2 
+                        + feature.properties.ISO3).toLowerCase().includes(word);
+            });
+            if (value == input.toString().split(" ").length){
+                addMarkerActions(feature);
+                foundLocation = true;
+                return true;
+            }
+            return false;
+        }})
         if(foundLocation) {
-
             mymap.fitBounds(search.getBounds());
         } else {
             alert("Location not found... replace with modal popup");
@@ -311,7 +301,7 @@ function onClickSearch(input) {
 //  locations that fits within the filtered range and will throw and error if there are no
 //  results found
 function searchPopulationPercent() {
-    $.getJSON("./Data/GeoJSONFiles/allpoint.geojson", function (data) {
+    $.getJSON("/Data/GeoJSONFiles/allpoint.geojson", function (data) {
         var dropDownValue = document.getElementById("dropDown").value;
         if (dropDownValue === "") {
             alert("Location not selected in the dropdown. Canceling search");
@@ -442,9 +432,9 @@ function filterComparison(feature, initialAmount, range, type) {
     } else /* if (type == "carbon") */ {
         featureType = feature.properties.CARBON;
     } //else type gdp
-     
+
     if (featureType >= (initialAmount * (1.0 - range)) &&
-        featureType <= (initialAmount * (1.0 + range))) { 
+        featureType <= (initialAmount * (1.0 + range))) {
         return true;
     }
     return false;
@@ -498,12 +488,8 @@ function addMarkerActions(feature) {
     }
     // Because changing color also makes use of the 'feature' object and the switch statement,
     // I joined it with the pop-up function
-    var thisMarker = document.getElementsByClassName("leaflet-pane leaflet-marker-pane")[0];
-    thisMarker.lastChild.src = 
-            'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-' + color + ".png"; 
-    // var dropDownValue = document.getElementById("dropDown").value;
-    // var pop = markerObject[dropDownValue]._layers[markerObject[dropDownValue]._leaflet_id - 1].feature.properties.POPULATION;
-    // thisMarker.lastChild.style.opacity = 1 - 0.8 * (Math.abs(feature.properties.POPULATION - pop) / (0.2 * pop)); 
+    document.getElementsByClassName("leaflet-pane leaflet-marker-pane")[0].lastChild.src = 
+            'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-' + color + ".png";
 }
 
 // This method removes all the options within the dropdown list
@@ -550,6 +536,8 @@ function searchCompare() {
 }
 
 function openExplore() {
+    document.getElementById("panel-title").classList.add("hidden");
+    document.getElementById("controlboxInner").classList.remove("hidden");
     mymap.removeControl(compare);
     isOnCompare = false;
     mymap.addControl(explore);
@@ -567,6 +555,8 @@ function openCompare() {
     mymap.removeControl(explore);
     isOnCompare = true;
     mymap.addControl(compare);
+    document.getElementById("controlboxInner").classList.add("hidden");
+    document.getElementById("panel-title").classList.remove("hidden");
     $(".panel").toggle(function () {
         autocomplete(document.getElementById("compare1"), nationList, "compare1");
         autocomplete(document.getElementById("compare2"), nationList, "compare2");
@@ -580,6 +570,7 @@ function openCompare() {
             scaleSelection("compare2", scaleVal);
         });
 
+        
     });
     document.getElementById("controlbox").classList.add("hidden");
 
@@ -703,18 +694,4 @@ function autocomplete(inp, arr, compareSearch) {
     document.addEventListener("click", function (e) {
         closeAllLists(e.target);
     });
-    marker.addTo(markerLayer);
-    markerObject[feature.properties.ORIG_FID] = marker;
-    marker.on("click", function(event) {
-        document.getElementById("dropDown").selectedIndex = dropDownOptions.indexOf(event.layer.feature.properties.ORIG_FID + "");
-//>>>>>>> master conflict started on line 291
-    });
-}
-
-// This method removes all the options within the dropdown list
-function removeLocationOptions() {
-    var locationList = document.getElementById("dropDown");
-    for ( var i = locationList.options.length -1 ; i >= 0 ; i-- ) {
-        locationList.remove(i);
-    }
 }
