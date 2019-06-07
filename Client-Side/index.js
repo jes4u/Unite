@@ -320,8 +320,8 @@ function onClickSearch(input) {
             }
             value = 0;
             (input.toString().toLowerCase().split(" ")).forEach(function(word){
-                value += (feature.properties.UNINAME.toString() + feature.properties.NAME 
-                        + feature.properties.NAME_0 + feature.properties.NAME_1 + feature.properties.NAME_2 
+                value += (feature.properties.UNINAME.toString() + feature.properties.NAME
+                        + feature.properties.NAME_0 + feature.properties.NAME_1 + feature.properties.NAME_2
                         + feature.properties.ISO3).toLowerCase().includes(word);
             });
             if (value == input.toString().split(" ").length){
@@ -385,14 +385,14 @@ function searchPopulationPercent() {
             popDen: {
                 name: "popDen",
                 valPercent: values.popDen / 100,
-                value: selectedProperties.POPDENSITY, 
-                slider: sliderCheck.popDen 
+                value: selectedProperties.POPDENSITY,
+                slider: sliderCheck.popDen
             },
             carbonPerCap: {
                 name: "carbonPerCap",
                 valPercent: values.carbonPerCap / 100,
-                value: selectedProperties.PERCAPCARB, 
-                slider: sliderCheck.carbonPerCap 
+                value: selectedProperties.PERCAPCARB,
+                slider: sliderCheck.carbonPerCap
             }
 
         }
@@ -424,9 +424,9 @@ function searchPopulationPercent() {
             filter: function (feature) {
 
                 for ( var i = 0 ; i < loop.length ; i++) {
-                    if(!filterComparison(feature, 
-                                        selectedLocation[loop[i]].value, 
-                                        selectedLocation[loop[i]].valPercent, 
+                    if(!filterComparison(feature,
+                                        selectedLocation[loop[i]].value,
+                                        selectedLocation[loop[i]].valPercent,
                                         selectedLocation[loop[i]].name)){
                         return false;
                     }
@@ -487,7 +487,7 @@ function addMarkerActions(feature) {
             color = "green";
             break;
         case "COUNTY":
-            title = "County:  " + feature.properties.NAME_2 + ", " 
+            title = "County:  " + feature.properties.NAME_2 + ", "
                     + feature.properties.NAME_1 + ", " + feature.properties.NAME_0;
             color = "yellow";
             break;
@@ -522,7 +522,7 @@ function addMarkerActions(feature) {
     }
     // Because changing color also makes use of the 'feature' object and the switch statement,
     // I joined it with the pop-up function
-    document.getElementsByClassName("leaflet-pane leaflet-marker-pane")[0].lastChild.src = 
+    document.getElementsByClassName("leaflet-pane leaflet-marker-pane")[0].lastChild.src =
             'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-' + color + ".png";
 }
 
@@ -609,7 +609,7 @@ function openCompare() {
             scaleSelection("compare2", scaleVal);
         });
 
-        
+
     });
     document.getElementById("controlbox").classList.add("hidden");
 
@@ -628,7 +628,7 @@ function scaleSelection(compareSearch, scale) {
 }
 
 
-// Source: https://www.w3schools.com/howto/howto_js_autocomplete.asp 
+// Source: https://www.w3schools.com/howto/howto_js_autocomplete.asp
 function autocomplete(inp, arr, compareSearch) {
     /*the autocomplete function takes two arguments,
     the text field element and an array of possible autocompleted values:*/
