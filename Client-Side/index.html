@@ -39,9 +39,46 @@
                     </ul>
                 </nav>
 
-                <button class="col-1 float-right text-dark" onclick="openExplore()"> Explore </button>
+                <button class="col-0 float-right nav_top_button text_color_nav" onclick="openExplore()"> Explore </button>
 
-                <button class="col-1 float-right text-dark" onclick="openCompare()"> Compare </button>
+                <button class="col-0 float-right nav_top_button text_color_nav" onclick="openCompare()"> Compare </button>
+
+               <!-- Button trigger modal -->
+                <button type="button" class="btn btn-primary border-0" data-toggle="modal" data-target="#exampleModalLong">
+                    Tutorial
+                </button>
+                
+                <!-- Modal -->
+                <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Tutorial</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        </div>
+                        <div class="modal-body">
+                            <p id="tutorial_menu">
+                                This application helps the users to explor the places around the world in each scope of
+                                city, county, state and nation. <br><br>
+                                <b>"STEPS"</b> <br>
+                                <b>1:</b>You will see is the map with a nationwide view. <br><br>
+                                <b>2:</b>You will then search the place of your interest in the search box located at the top-left corner while <b>also</b> selecting what scope of the place you are searching for. <br><br>
+                                <b>3:</b>The place you searched for will popup with an icon on the map. <br>Clicking this icon will give you information about the place you clicked on. It will also provide you with a "Search for more information!" link on the bottom. <br><br>
+                                <b>4:</b>Then, one the left side, you will check between the categories of 'GDP,' 'Population,' 'Population Density,' 'Carbon Emission,' and 'Carbon Per Capita' that you are interested in. <br><br>
+                                <b>5:</b>Also, you will adjust the slider on the information you check in order to look up for the similar place around the world with that much similarity for each categories. <br><br>
+                                <b>6:</b>After you click "search for similar places" button, you will get numerous of pins showing which areas show the similarity of the original place you looked up for. <br><br>
+                                <b>7:</b>Clicking each icons on the map after this search would give you the information on the area with the information you checked for and the link to "Search for more information!" on the bottom as well. <br><br>
+                                <b>Compare Tool</b> will let you compare two places of your interest that you already have in mind. 
+                            </p>
+                        </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                    </div>
+                </div>
 
                 <!-- Button trigger modal -->
                 <button type="button" class="btn btn-primary border-0 col-1" data-toggle="modal" data-target="#example">
