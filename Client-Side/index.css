@@ -84,6 +84,9 @@ input[type=submit] {
   background-color: DodgerBlue;
   color: #fff;
 }
+span {
+  font-size:12px;
+}
 .autocomplete-items {
   position: absolute;
   border: 1px solid #d4d4d4;
