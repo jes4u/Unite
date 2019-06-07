@@ -153,7 +153,7 @@ $(document).ready(function () {
     // Onclick search button
     explore._searchfunctionCallBack = function (searchkeywords) {
         if (!searchkeywords) {
-            searchkeywords = "The search call back is clicked !!"
+            searchkeywords = ""
         }
 
         onClickSearch(searchkeywords)
@@ -299,6 +299,12 @@ function themeInfo(feature, content) {
 //  the geoJSON file and create markers for each location that matches the results
 // If there are no results, an error will appear saying no location has been found
 function onClickSearch(input) {
+    if (input === "") {
+        document.getElementById("errorModalText").textContent = 'Location "' + input + '" was not found. Please try again. ' +
+        'Hint: You can change the scope of the location to narrow down your search!';
+        $('#errorModal').modal("toggle");
+        return;
+    }
     $.getJSON('./Data/GeoJSONFiles/allpoint.geojson', function (data) {
         var search;
         var foundLocation = false;
@@ -328,7 +334,9 @@ function onClickSearch(input) {
         if(foundLocation) {
             mymap.fitBounds(search.getBounds());
         } else {
-            alert("Location not found... replace with modal popup");
+            document.getElementById("errorModalText").textContent = 'Location "' + input + '" was not found. Please try again. ' +
+                'Hint: You can change the scope of the location to narrow down your search!';
+            $('#errorModal').modal("toggle");
         }
 
     });
@@ -342,12 +350,14 @@ function searchPopulationPercent() {
     $.getJSON("/Data/GeoJSONFiles/allpoint.geojson", function (data) {
         var dropDownValue = document.getElementById("dropDown").value;
         if (dropDownValue === "") {
-            alert("Location not selected in the dropdown. Canceling search");
+            document.getElementById("errorModalText").textContent = "A location was not selected in the dropdown. Canceling search.";
+            $('#errorModal').modal("toggle");
             return;
         }
 
         if (!sliderCheck.carbon && !sliderCheck.gdp && !sliderCheck.population && !sliderCheck.carbonPerCap && !sliderCheck.popDen) {
-            alert("No filters selected. Canceling search");
+            document.getElementById("errorModalText").textContent = "No filters selected. Canceling search.";
+            $('#errorModal').modal("toggle");
             return;
         }
 
@@ -437,7 +447,8 @@ function searchPopulationPercent() {
         if (foundMatches) {
             mymap.fitBounds(search.getBounds());
         } else {
-            alert("No matches found.... replace with modal popup");
+            document.getElementById("errorModalText").textContent = "No locations found with similar option percentages chosen.";
+            $('#errorModal').modal("toggle");
         }
 
     });
@@ -552,7 +563,8 @@ function searchCompare() {
         if (foundLocation) {
             mymap.fitBounds(search.getBounds())
         } else {
-            alert("Location not found... replace with modal popup");
+            document.getElementById("errorModalText").textContent = "Location was not found. Canceling search.";
+            $('#errorModal').modal("toggle");
         }
 
     });
@@ -560,7 +572,10 @@ function searchCompare() {
 
 function openExplore() {
     document.getElementById("panel-title").classList.add("hidden");
+    document.getElementById("controlbox").classList.remove("hidden");
     document.getElementById("controlboxInner").classList.remove("hidden");
+    
+
     mymap.removeControl(compare);
     isOnCompare = false;
     mymap.addControl(explore);
@@ -578,6 +593,7 @@ function openCompare() {
     mymap.removeControl(explore);
     isOnCompare = true;
     mymap.addControl(compare);
+    document.getElementById("controlbox").classList.add("hidden");
     document.getElementById("controlboxInner").classList.add("hidden");
     document.getElementById("panel-title").classList.remove("hidden");
     $(".panel").toggle(function () {
