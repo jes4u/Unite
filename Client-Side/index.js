@@ -5,13 +5,17 @@
 var values = {
     population: 0,
     gdp: 0,
-    carbon: 0
+    carbon: 0,
+    popDen: 0,
+    carbonPerCap: 0
 };
 
 var sliderCheck = {
     population: false,
     gdp: false,
-    carbon: false
+    carbon: false,
+    popDen: false,
+    carbonPerCap: false
 }
 
 var sliderValues = {
@@ -23,9 +27,15 @@ var sliderValues = {
         min: 0,
         max: 20
     },
-
-    carbon : {
-
+    carbon: {
+        min: 0,
+        max: 20
+    },
+    popDen: {
+        min: 0,
+        max: 20
+    },
+    carbonPerCap: {
         min: 0,
         max: 20
     }
@@ -34,7 +44,6 @@ var sliderValues = {
 //Map object
 var mymap;
 var currentSelcted;
-
 var explore;
 var compare;
 var color;
@@ -56,7 +65,9 @@ var isOnCompare = false;
 var compare1;
 var compare2;
 
+
 $(document).ready(function () {
+
 
     $("#mapid").height($(window).height()).width($(window).width());
 
@@ -76,7 +87,6 @@ $(document).ready(function () {
     // The variables searchboxControl and control determine the options within the filter panel
     var searchboxControl = createSearchboxControl();
     explore = new searchboxControl({
-
         sidebarTitleText: "",
         sidebarMenuItems: {
             Items: [
@@ -98,16 +108,31 @@ $(document).ready(function () {
                 },
                 {
                     type: "checkbox",
+                    name: "&ensp;  Population Density",
+                    value: "popDen",
+                    onclick: "activateSlider('popDen');",
+                    min: sliderValues.popDen.min,
+                    max: sliderValues.popDen.max
+                },
+                {
+                    type: "checkbox",
                     name: "&ensp;  Carbon Emissions",
                     value: "carbon",
                     onclick: "activateSlider('carbon');",
                     min: sliderValues.carbon.min,
                     max: sliderValues.carbon.max
-                }
+                },
+                {
+                    type: "checkbox",
+                    name: "&ensp;  Carbon Per Capita",
+                    value: "carbonPerCap",
+                    onclick: "activateSlider('carbonPerCap');",
+                    min: sliderValues.carbonPerCap.min,
+                    max: sliderValues.carbonPerCap.max
+                },
             ]
         }
     });
-
 
     compare = new searchboxControl({
         sidebarTitleText: "Compare",
@@ -136,6 +161,7 @@ $(document).ready(function () {
     mymap.addControl(explore);
 
     markerLayer = L.layerGroup().addTo(mymap);
+
     $.getJSON('./Data/GeoJSONFiles/nationpoint.geojson', function (data) {
         var search
         search = L.geoJson(data, {
@@ -161,7 +187,9 @@ $(document).ready(function () {
             }
         })
     });
+
 });
+
 
 // This method controls the display of the sliders within the filter panel.
 //If the checkbox is checked then the slider appears, if it is not checked, the slider disappears
@@ -203,7 +231,6 @@ function popupContent(feature, title) {
     // keyword += themeKeyword();
     link.href = "http://www.google.com/search?q=" + title.split(": ")[1];
     link.innerHTML = "Search for more information!";
-
     link.target = "_blank";
     content.appendChild(link);
     currentSelcted = feature;
@@ -228,6 +255,10 @@ function themeKeyword() {
         return "Population";
     } else if (document.getElementById("carbonID").checked) {
         return "Carbon Emission";
+    } else if (document.getElementById("popDenID").checked) {
+        return "Population Density";
+    } else if (document.getElementById("carbonPerCapID").checked) {
+        return "Carbon Per Capita";
     } else {
         return "";
     }
@@ -241,20 +272,26 @@ function themeInfo(feature, content) {
     if (isOnCompare || document.getElementById("populationID").checked) {
         var population = document.createElement("p");
         population.innerHTML = "Population: " + feature.properties.POPULATION;
-        var popDensity = document.createElement("p");
-        popDensity.innerHTML = "Population Density: " + feature.properties.POPDENSITY;
         content.appendChild(population);
-        content.appendChild(popDensity);
     }
     if (isOnCompare || document.getElementById("carbonID").checked) {
         var carbon = document.createElement("p");
         carbon.innerHTML = "Carbon Emission Level: " + feature.properties.CARBON;
+        content.appendChild(carbon);
+    }
+    if (isOnCompare || document.getElementById("popDenID").checked) {
+        var popDensity = document.createElement("p");
+        popDensity.innerHTML = "Population Density: " + feature.properties.POPDENSITY;
+        content.appendChild(popDensity);
+
+    }
+    if (isOnCompare || document.getElementById("carbonPerCapID").checked) {
         var perCapCarbon = document.createElement("p");
         perCapCarbon.innerHTML = "Carbon Emission per Capita: " + feature.properties.PERCAPCARB;
-        content.appendChild(carbon);
         content.appendChild(perCapCarbon);
 
     }
+
     return content;
 }
 
@@ -269,30 +306,26 @@ function onClickSearch(input) {
         removeLocationOptions();
         dropDownOptions = [];
         var value = 0;
-
         var scale = document.getElementById("scale").options[document.getElementById("scale")
                 .selectedIndex].value.toUpperCase();
-        search = L.geoJson(data, {
-            filter: function(feature) {
-                if (feature.properties.UNITTYPE != scale || feature.properties.UNINAME.split(" ").length == 1) {
-                    return false;
-                }
-                value = 0;
-                (input.toString().toLowerCase().split(" ")).forEach(function(word){
-                    value += (feature.properties.UNINAME.toString() + feature.properties.NAME
-                            + feature.properties.NAME_0 + feature.properties.NAME_1 + feature.properties.NAME_2
-                            + feature.properties.ISO3).toLowerCase().includes(word);
-                });
-                if (value == input.toString().split(" ").length){
-                    addMarkerActions(feature);
-                    foundLocation = true;
-                    return true;
-                }
+        search = L.geoJson(data, {filter: function(feature) {
+            if (feature.properties.UNITTYPE != scale || feature.properties.UNINAME.split(" ").length == 1) {
                 return false;
             }
-        });
+            value = 0;
+            (input.toString().toLowerCase().split(" ")).forEach(function(word){
+                value += (feature.properties.UNINAME.toString() + feature.properties.NAME
+                        + feature.properties.NAME_0 + feature.properties.NAME_1 + feature.properties.NAME_2
+                        + feature.properties.ISO3).toLowerCase().includes(word);
+            });
+            if (value == input.toString().split(" ").length){
+                addMarkerActions(feature);
+                foundLocation = true;
+                return true;
+            }
+            return false;
+        }})
         if(foundLocation) {
-
             mymap.fitBounds(search.getBounds());
         } else {
             alert("Location not found... replace with modal popup");
@@ -306,14 +339,14 @@ function onClickSearch(input) {
 //  locations that fits within the filtered range and will throw and error if there are no
 //  results found
 function searchPopulationPercent() {
-    $.getJSON("./Data/GeoJSONFiles/allpoint.geojson", function (data) {
+    $.getJSON("/Data/GeoJSONFiles/allpoint.geojson", function (data) {
         var dropDownValue = document.getElementById("dropDown").value;
         if (dropDownValue === "") {
             alert("Location not selected in the dropdown. Canceling search");
             return;
         }
 
-        if (!sliderCheck.carbon && !sliderCheck.gdp && !sliderCheck.population) {
+        if (!sliderCheck.carbon && !sliderCheck.gdp && !sliderCheck.population && !sliderCheck.carbonPerCap && !sliderCheck.popDen) {
             alert("No filters selected. Canceling search");
             return;
         }
@@ -338,7 +371,37 @@ function searchPopulationPercent() {
                 valPercent: values.gdp / 100,
                 value: 0, //insert value amount
                 slider: false // change to sliderCheck.gdp after getting data
+            },
+            popDen: {
+                name: "popDen",
+                valPercent: values.popDen / 100,
+                value: selectedProperties.POPDENSITY,
+                slider: sliderCheck.popDen
+            },
+            carbonPerCap: {
+                name: "carbonPerCap",
+                valPercent: values.carbonPerCap / 100,
+                value: selectedProperties.PERCAPCARB,
+                slider: sliderCheck.carbonPerCap
             }
+
+        }
+
+        var loop = []
+        if(selectedLocation.population.slider) {
+            loop.push("population");
+        }
+        if(selectedLocation.gdp.slider) {
+            loop.push("gdp");
+        }
+        if(selectedLocation.carbon.slider) {
+            loop.push("carbon");
+        }
+        if(selectedLocation.carbonPerCap.slider) {
+            loop.push("carbonPerCap");
+        }
+        if(selectedLocation.popDen.slider) {
+            loop.push("popDen");
         }
 
         var foundMatches = false;
@@ -350,26 +413,24 @@ function searchPopulationPercent() {
         search = L.geoJson(data, {
             filter: function (feature) {
 
-                //Each if statements calls the same function but changes the ordering of filter options
-                if (cycleSelectedFilters(feature, selectedLocation.population, selectedLocation.carbon, selectedLocation.gdp)) {
-                    if (!foundMatches) {
-                        markerLayer.clearLayers();
-                        removeLocationOptions();
-                        dropDownOptions = [];
+                for ( var i = 0 ; i < loop.length ; i++) {
+                    if(!filterComparison(feature,
+                                        selectedLocation[loop[i]].value,
+                                        selectedLocation[loop[i]].valPercent,
+                                        selectedLocation[loop[i]].name)){
+                        return false;
                     }
-                    foundMatches = true;
-                    return true;
-                } else if (cycleSelectedFilters(feature, selectedLocation.carbon, selectedLocation.population, selectedLocation.gdp)) {
-                    if (!foundMatches) {
-                        markerLayer.clearLayers();
-                        removeLocationOptions();
-                        dropDownOptions = [];
-                    }
-                    foundMatches = true;
-                    return true;
-                } else { //Add another else if for gdp
-                    return false;
                 }
+
+                //If the for loop doesn't return false, then the feature variable is within range of all checkboxes
+                if(!foundMatches) {
+                    markerLayer.clearLayers();
+                    removeLocationOptions();
+                    dropDownOptions = [];
+                }
+                foundMatches = true;
+                addMarkerActions(feature);
+                return true;
 
             }
         })
@@ -382,51 +443,6 @@ function searchPopulationPercent() {
     });
 }
 
-// This function goes through each filter selection and determines in the filter will apply and will
-//  add a new marker for the feature accordingly
-// If feature is within the filter bounds, the method will return true, otherwise it will return false
-function cycleSelectedFilters(feature, selection1, selection2, selection3) {
-    if (selection1.slider) {
-        if (filterComparison(feature, selection1.value, selection1.valPercent, selection1.name)) {
-            if (selection2.slider) {
-                if (filterComparison(feature, selection2.value, selection2.valPercent, selection2.name)) {
-                    // Another if statement for gdp
-                    // if (sliderCheck.gdp) {
-                    //     if (gdpComparison(feature, selectedGDP, gdpValPercent) ) {
-                    //         return true;
-                    //     } else {
-                    //         return false;
-                    //     }
-                    // }
-                    addMarkerActions(feature);
-                    return true;
-                } else {
-                    return false;
-                }
-
-            }
-            // Another if statement for gdp
-            // if (sliderCheck.gdp) {
-            //     if (gdpComparison(feature, selectedGDP, gdpValPercent) ) {
-            //         if(sliderCheck.carbon) {
-            //             if (carbonComparision(feature, selectedCarbon, carbonValPercent) ) {
-            //                 return true;
-            //             } else {
-            //                 return false;
-            //             }
-            //         }
-            //         return true;
-            //     } else {
-            //         return false;
-            //     }
-            // }
-            addMarkerActions(feature);
-            return true;
-        } else {
-            return false;
-        }
-    }
-}
 
 // This method compares the feature with the filter bounds
 // The method will return true if the feature is within bounds and false if not
@@ -434,9 +450,14 @@ function filterComparison(feature, initialAmount, range, type) {
     var featureType;
     if (type == "population") {
         featureType = feature.properties.POPULATION;
-    } else /* if (type == "carbon") */ {
+    } else if (type == "carbon") {
         featureType = feature.properties.CARBON;
-    } //else type gdp
+    } else if (type == "popDen") {
+        featureType = feature.properties.POPDENSITY;
+    }  else if (type == "carbonPerCap") {
+        featureType = feature.properties.PERCAPCARB;
+    }
+    //else type gdp
 
     if (featureType >= (initialAmount * (1.0 - range)) &&
         featureType <= (initialAmount * (1.0 + range))) {
@@ -480,10 +501,7 @@ function addMarkerActions(feature) {
     if(!isOnCompare){
         dropDown.appendChild(option);
     }
-    var marker = L.geoJson(feature).bindPopup(content);//.addTo(markerLayer);
-    marker.setStyle({
-        fillColor: 'white'
-    });
+    var marker = L.geoJson(feature).bindPopup(content);
     marker.addTo(markerLayer);
     markerObject[feature.properties.ORIG_FID] = marker;
     if (!isOnCompare){
@@ -493,12 +511,8 @@ function addMarkerActions(feature) {
     }
     // Because changing color also makes use of the 'feature' object and the switch statement,
     // I joined it with the pop-up function
-    var thisMarker = document.getElementsByClassName("leaflet-pane leaflet-marker-pane")[0];
-    thisMarker.lastChild.src =
+    document.getElementsByClassName("leaflet-pane leaflet-marker-pane")[0].lastChild.src =
             'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-' + color + ".png";
-    var dropDownValue = document.getElementById("dropDown").value;
-    var pop = markerObject[dropDownValue]._layers[markerObject[dropDownValue]._leaflet_id - 1].feature.properties.POPULATION;
-    thisMarker.lastChild.style.opacity = 1 - 0.8 * (Math.abs(feature.properties.POPULATION - pop) / (0.2 * pop));
 }
 
 // This method removes all the options within the dropdown list
@@ -545,6 +559,8 @@ function searchCompare() {
 }
 
 function openExplore() {
+    document.getElementById("panel-title").classList.add("hidden");
+    document.getElementById("controlboxInner").classList.remove("hidden");
     mymap.removeControl(compare);
     isOnCompare = false;
     mymap.addControl(explore);
@@ -562,6 +578,8 @@ function openCompare() {
     mymap.removeControl(explore);
     isOnCompare = true;
     mymap.addControl(compare);
+    document.getElementById("controlboxInner").classList.add("hidden");
+    document.getElementById("panel-title").classList.remove("hidden");
     $(".panel").toggle(function () {
         autocomplete(document.getElementById("compare1"), nationList, "compare1");
         autocomplete(document.getElementById("compare2"), nationList, "compare2");
@@ -574,6 +592,7 @@ function openCompare() {
             var scaleVal = document.getElementById("scale1").value;
             scaleSelection("compare2", scaleVal);
         });
+
 
     });
     document.getElementById("controlbox").classList.add("hidden");
@@ -698,18 +717,4 @@ function autocomplete(inp, arr, compareSearch) {
     document.addEventListener("click", function (e) {
         closeAllLists(e.target);
     });
-    marker.addTo(markerLayer);
-    markerObject[feature.properties.ORIG_FID] = marker;
-    marker.on("click", function(event) {
-        document.getElementById("dropDown").selectedIndex = dropDownOptions.indexOf(event.layer.feature.properties.ORIG_FID + "");
-//>>>>>>> master conflict started on line 291
-    });
-}
-
-// This method removes all the options within the dropdown list
-function removeLocationOptions() {
-    var locationList = document.getElementById("dropDown");
-    for ( var i = locationList.options.length -1 ; i >= 0 ; i-- ) {
-        locationList.remove(i);
-    }
 }

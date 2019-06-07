@@ -178,18 +178,22 @@ a,button,h1,h2,h3,h4,h5,h6,input,ol,p,textarea,th,ul{
 .panel{
     width:398px;
     float:left;
-    height:450px;
+    height:600px;
     background-color: #ECEBE5 !important;;
     position:relative;
     display:none
 }
 
 .panel-header{
-    display:table
+    display:table;
+    margin: 0 auto;
+
 }
 
 .panel-header-container{
-    display:table-row
+    display:table-row;
+    margin: 0 auto;
+
 }
 
 .panel-header-title{
@@ -204,6 +208,23 @@ a,button,h1,h2,h3,h4,h5,h6,input,ol,p,textarea,th,ul{
     color:#c3c3c3
 }
 
+#panel-title{
+    position: relative;
+    margin: 0 auto;
+}
+
+#panel-header-text{
+    display:table-cell;
+    font-weight:600;
+    font-size:20px;
+    text-align:center;
+    width:95%;
+    line-height:24px;
+    padding-top:10px;
+    padding-bottom:10px;
+    color: black;
+}
+
 .panel-close-button{
     background:url(image/ic_navigate_before_black_24dp_2x.png) no-repeat;background-size:100%;height:24px;width:24px;margin:5px;cursor:pointer;opacity:.6;vertical-align:middle
 }
@@ -213,7 +234,7 @@ a,button,h1,h2,h3,h4,h5,h6,input,ol,p,textarea,th,ul{
 }
 
 .panel-list{
-    border-top:1px solid #d9d9d9;color:black;font-size:13px;padding-top:10px
+    border-top:1px solid #d9d9d9;color:black;font-size:11px;padding-top:10px
 }
 
 .panel-list-item{
@@ -225,7 +246,7 @@ a,button,h1,h2,h3,h4,h5,h6,input,ol,p,textarea,th,ul{
 }
 
 .panel-content a,button,li:hover{
-    color:#777;cursor:pointer;font-size:14px;line-height:22px;vertical-align:top
+    color:#777;cursor:pointer;vertical-align:top;
 }
 
 .panel-content a{
