@@ -456,6 +456,11 @@ function filterComparison(feature, initialAmount, range, type) {
         featureType = feature.properties.POPDENSITY;
     }  else if (type == "carbonPerCap") {
         featureType = feature.properties.PERCAPCARB;
+        if (featureType >= (initialAmount * (1.0 - range)) &&
+            featureType <= initialAmount) {
+            return true;
+        }
+        return false;
     }
     //else type gdp
 
@@ -511,8 +516,12 @@ function addMarkerActions(feature) {
     }
     // Because changing color also makes use of the 'feature' object and the switch statement,
     // I joined it with the pop-up function
-    document.getElementsByClassName("leaflet-pane leaflet-marker-pane")[0].lastChild.src = 
-            'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-' + color + ".png";
+    var thisMarker = document.getElementsByClassName("leaflet-pane leaflet-marker-pane")[0];
+    thisMarker.lastChild.src = 
+            'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-' + color + ".png"; 
+    // var dropDownValue = document.getElementById("dropDown").value;
+    // var pop = markerObject[dropDownValue]._layers[markerObject[dropDownValue]._leaflet_id - 1].feature.properties.PERCAPCARB;
+    // thisMarker.lastChild.style.opacity = 1 - 0.8 * (Math.abs(feature.properties.POPULATION - pop) / (0.2 * pop)); 
 }
 
 // This method removes all the options within the dropdown list
