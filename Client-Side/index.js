@@ -155,7 +155,7 @@ $(document).ready(function () {
     // Onclick search button
     explore._searchfunctionCallBack = function (searchkeywords) {
         if (!searchkeywords) {
-            searchkeywords = "The search call back is clicked !!"
+            searchkeywords = ""
         }
 
         onClickSearch(searchkeywords)
@@ -303,6 +303,12 @@ function themeInfo(feature, content) {
 //  the geoJSON file and create markers for each location that matches the results
 // If there are no results, an error will appear saying no location has been found
 function onClickSearch(input) {
+    if (input === "") {
+        document.getElementById("errorModalText").textContent = 'Location "' + input + '" was not found. Please try again. ' +
+        'Hint: You can change the scope of the location to narrow down your search!';
+        $('#errorModal').modal("toggle");
+        return;
+    }
     $.getJSON('./Data/GeoJSONFiles/everypoint.geojson', function (data) {
         var search;
         var foundLocation = false;
@@ -318,8 +324,8 @@ function onClickSearch(input) {
             }
             value = 0;
             (input.toString().toLowerCase().split(" ")).forEach(function(word){
-                value += (feature.properties.UNINAME.toString() + feature.properties.NAME 
-                        + feature.properties.NAME_0 + feature.properties.NAME_1 + feature.properties.NAME_2 
+                value += (feature.properties.UNINAME.toString() + feature.properties.NAME
+                        + feature.properties.NAME_0 + feature.properties.NAME_1 + feature.properties.NAME_2
                         + feature.properties.ISO3).toLowerCase().includes(word);
             });
             if (value == input.toString().split(" ").length){
@@ -332,7 +338,9 @@ function onClickSearch(input) {
         if(foundLocation) {
             mymap.fitBounds(search.getBounds());
         } else {
-            alert("Location not found... replace with modal popup");
+            document.getElementById("errorModalText").textContent = 'Location "' + input + '" was not found. Please try again. ' +
+                'Hint: You can change the scope of the location to narrow down your search!';
+            $('#errorModal').modal("toggle");
         }
 
     });
@@ -346,12 +354,14 @@ function searchPopulationPercent() {
     $.getJSON("./Data/GeoJSONFiles/everypoint.geojson", function (data) {
         var dropDownValue = document.getElementById("dropDown").value;
         if (dropDownValue === "") {
-            alert("Location not selected in the dropdown. Canceling search");
+            document.getElementById("errorModalText").textContent = "A location was not selected in the dropdown. Canceling search.";
+            $('#errorModal').modal("toggle");
             return;
         }
 
         if (!sliderCheck.carbon && !sliderCheck.gdp && !sliderCheck.population && !sliderCheck.carbonPerCap && !sliderCheck.popDen) {
-            alert("No filters selected. Canceling search");
+            document.getElementById("errorModalText").textContent = "No filters selected. Canceling search.";
+            $('#errorModal').modal("toggle");
             return;
         }
 
@@ -379,14 +389,14 @@ function searchPopulationPercent() {
             popDen: {
                 name: "popDen",
                 valPercent: values.popDen / 100,
-                value: selectedProperties.POPDENSITY, 
-                slider: sliderCheck.popDen 
+                value: selectedProperties.POPDENSITY,
+                slider: sliderCheck.popDen
             },
             carbonPerCap: {
                 name: "carbonPerCap",
                 valPercent: values.carbonPerCap / 100,
-                value: selectedProperties.PERCAPCARB, 
-                slider: sliderCheck.carbonPerCap 
+                value: selectedProperties.PERCAPCARB,
+                slider: sliderCheck.carbonPerCap
             }
 
         }
@@ -418,9 +428,9 @@ function searchPopulationPercent() {
             filter: function (feature) {
 
                 for ( var i = 0 ; i < loop.length ; i++) {
-                    if(!filterComparison(feature, 
-                                        selectedLocation[loop[i]].value, 
-                                        selectedLocation[loop[i]].valPercent, 
+                    if(!filterComparison(feature,
+                                        selectedLocation[loop[i]].value,
+                                        selectedLocation[loop[i]].valPercent,
                                         selectedLocation[loop[i]].name)){
                         return false;
                     }
@@ -441,7 +451,8 @@ function searchPopulationPercent() {
         if (foundMatches) {
             mymap.fitBounds(search.getBounds());
         } else {
-            alert("No matches found.... replace with modal popup");
+            document.getElementById("errorModalText").textContent = "No locations found with similar option percentages chosen.";
+            $('#errorModal').modal("toggle");
         }
 
     });
@@ -486,7 +497,7 @@ function addMarkerActions(feature) {
             color = "green";
             break;
         case "COUNTY":
-            title = "County:  " + feature.properties.NAME_2 + ", " 
+            title = "County:  " + feature.properties.NAME_2 + ", "
                     + feature.properties.NAME_1 + ", " + feature.properties.NAME_0;
             color = "yellow";
             break;
@@ -572,7 +583,8 @@ function searchCompare() {
         if (foundLocation) {
             mymap.fitBounds(search.getBounds())
         } else {
-            alert("Location not found... replace with modal popup");
+            document.getElementById("errorModalText").textContent = "Location was not found. Canceling search.";
+            $('#errorModal').modal("toggle");
         }
 
     });
@@ -580,7 +592,10 @@ function searchCompare() {
 
 function openExplore() {
     document.getElementById("panel-title").classList.add("hidden");
+    document.getElementById("controlbox").classList.remove("hidden");
     document.getElementById("controlboxInner").classList.remove("hidden");
+    
+
     mymap.removeControl(compare);
     isOnCompare = false;
     mymap.addControl(explore);
@@ -598,6 +613,7 @@ function openCompare() {
     mymap.removeControl(explore);
     isOnCompare = true;
     mymap.addControl(compare);
+    document.getElementById("controlbox").classList.add("hidden");
     document.getElementById("controlboxInner").classList.add("hidden");
     document.getElementById("panel-title").classList.remove("hidden");
     $(".panel").toggle(function () {
@@ -613,7 +629,7 @@ function openCompare() {
             scaleSelection("compare2", scaleVal);
         });
 
-        
+
     });
     document.getElementById("controlbox").classList.add("hidden");
 
@@ -632,7 +648,7 @@ function scaleSelection(compareSearch, scale) {
 }
 
 
-// Source: https://www.w3schools.com/howto/howto_js_autocomplete.asp 
+// Source: https://www.w3schools.com/howto/howto_js_autocomplete.asp
 function autocomplete(inp, arr, compareSearch) {
     /*the autocomplete function takes two arguments,
     the text field element and an array of possible autocompleted values:*/
