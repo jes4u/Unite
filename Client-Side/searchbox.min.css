@@ -121,7 +121,7 @@ a,button,h1,h2,h3,h4,h5,h6,input,ol,p,textarea,th,ul{
 .panel{
     width:398px;
     float:left;
-    height:450px;
+    height:600px;
     background-color: #ECEBE5 !important;;
     position:relative;
     display:none
@@ -177,7 +177,7 @@ a,button,h1,h2,h3,h4,h5,h6,input,ol,p,textarea,th,ul{
 }
 
 .panel-list{
-    border-top:1px solid #d9d9d9;color:black;font-size:13px;padding-top:10px
+    border-top:1px solid #d9d9d9;color:black;font-size:11px;padding-top:10px
 }
 
 .panel-list-item{
