@@ -181,7 +181,9 @@ a,button,h1,h2,h3,h4,h5,h6,input,ol,p,textarea,th,ul{
     height:600px;
     background-color: #ECEBE5 !important;;
     position:relative;
-    display:none
+    display:none;
+    overflow-x:none; 
+    overflow-y:auto;
 }
 
 .panel-header{
