@@ -56,9 +56,7 @@ var isOnCompare = false;
 var compare1;
 var compare2;
 
-
 $(document).ready(function () {
-
 
     $("#mapid").height($(window).height()).width($(window).width());
 
@@ -138,7 +136,6 @@ $(document).ready(function () {
     mymap.addControl(explore);
 
     markerLayer = L.layerGroup().addTo(mymap);
-
     $.getJSON('./Data/GeoJSONFiles/nationpoint.geojson', function (data) {
         var search
         search = L.geoJson(data, {
@@ -164,9 +161,7 @@ $(document).ready(function () {
             }
         })
     });
-
 });
-
 
 // This method controls the display of the sliders within the filter panel.
 //If the checkbox is checked then the slider appears, if it is not checked, the slider disappears
@@ -284,8 +279,8 @@ function onClickSearch(input) {
                 }
                 value = 0;
                 (input.toString().toLowerCase().split(" ")).forEach(function(word){
-                    value += (feature.properties.UNINAME.toString() + feature.properties.NAME 
-                            + feature.properties.NAME_0 + feature.properties.NAME_1 + feature.properties.NAME_2 
+                    value += (feature.properties.UNINAME.toString() + feature.properties.NAME
+                            + feature.properties.NAME_0 + feature.properties.NAME_1 + feature.properties.NAME_2
                             + feature.properties.ISO3).toLowerCase().includes(word);
                 });
                 if (value == input.toString().split(" ").length){
@@ -442,9 +437,9 @@ function filterComparison(feature, initialAmount, range, type) {
     } else /* if (type == "carbon") */ {
         featureType = feature.properties.CARBON;
     } //else type gdp
-     
+
     if (featureType >= (initialAmount * (1.0 - range)) &&
-        featureType <= (initialAmount * (1.0 + range))) { 
+        featureType <= (initialAmount * (1.0 + range))) {
         return true;
     }
     return false;
@@ -460,7 +455,7 @@ function addMarkerActions(feature) {
             color = "green";
             break;
         case "COUNTY":
-            title = "County:  " + feature.properties.NAME_2 + ", " 
+            title = "County:  " + feature.properties.NAME_2 + ", "
                     + feature.properties.NAME_1 + ", " + feature.properties.NAME_0;
             color = "yellow";
             break;
@@ -499,11 +494,11 @@ function addMarkerActions(feature) {
     // Because changing color also makes use of the 'feature' object and the switch statement,
     // I joined it with the pop-up function
     var thisMarker = document.getElementsByClassName("leaflet-pane leaflet-marker-pane")[0];
-    thisMarker.lastChild.src = 
-            'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-' + color + ".png"; 
-    // var dropDownValue = document.getElementById("dropDown").value;
-    // var pop = markerObject[dropDownValue]._layers[markerObject[dropDownValue]._leaflet_id - 1].feature.properties.POPULATION;
-    // thisMarker.lastChild.style.opacity = 1 - 0.8 * (Math.abs(feature.properties.POPULATION - pop) / (0.2 * pop)); 
+    thisMarker.lastChild.src =
+            'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-' + color + ".png";
+    var dropDownValue = document.getElementById("dropDown").value;
+    var pop = markerObject[dropDownValue]._layers[markerObject[dropDownValue]._leaflet_id - 1].feature.properties.POPULATION;
+    thisMarker.lastChild.style.opacity = 1 - 0.8 * (Math.abs(feature.properties.POPULATION - pop) / (0.2 * pop));
 }
 
 // This method removes all the options within the dropdown list
@@ -598,7 +593,7 @@ function scaleSelection(compareSearch, scale) {
 }
 
 
-// Source: https://www.w3schools.com/howto/howto_js_autocomplete.asp 
+// Source: https://www.w3schools.com/howto/howto_js_autocomplete.asp
 function autocomplete(inp, arr, compareSearch) {
     /*the autocomplete function takes two arguments,
     the text field element and an array of possible autocompleted values:*/
