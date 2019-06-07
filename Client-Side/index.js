@@ -83,6 +83,8 @@ $(document).ready(function () {
     }).addTo(mymap);
 
     mymap.zoomControl.setPosition('bottomright');
+    mymap.options.maxZoom = 10;
+    mymap.options.minZoom = 2;
 
     // The variables searchboxControl and control determine the options within the filter panel
     var searchboxControl = createSearchboxControl();
@@ -171,7 +173,7 @@ $(document).ready(function () {
         });
     });
 
-    $.getJSON('./Data/GeoJSONFiles/allpoint.geojson', function (data) {
+    $.getJSON('./Data/GeoJSONFiles/everypoint.geojson', function (data) {
         var search;
         search = L.geoJson(data, {
             filter: function (feature) {
@@ -267,7 +269,9 @@ function themeKeyword() {
 function themeInfo(feature, content) {
 
     if (isOnCompare || document.getElementById("gdpID").checked) {
-        // gdp to be added
+        var gdp = document.createElement("p");
+        gdp.innerHTML = "GPD per Capita (ppp): " + feature.properties["API_NY Data_2017"];
+        content.appendChild(gdp);
     }
     if (isOnCompare || document.getElementById("populationID").checked) {
         var population = document.createElement("p");
@@ -305,7 +309,7 @@ function onClickSearch(input) {
         $('#errorModal').modal("toggle");
         return;
     }
-    $.getJSON('./Data/GeoJSONFiles/allpoint.geojson', function (data) {
+    $.getJSON('./Data/GeoJSONFiles/everypoint.geojson', function (data) {
         var search;
         var foundLocation = false;
         markerLayer.clearLayers();
@@ -347,7 +351,7 @@ function onClickSearch(input) {
 //  locations that fits within the filtered range and will throw and error if there are no
 //  results found
 function searchPopulationPercent() {
-    $.getJSON("/Data/GeoJSONFiles/allpoint.geojson", function (data) {
+    $.getJSON("./Data/GeoJSONFiles/everypoint.geojson", function (data) {
         var dropDownValue = document.getElementById("dropDown").value;
         if (dropDownValue === "") {
             document.getElementById("errorModalText").textContent = "A location was not selected in the dropdown. Canceling search.";
@@ -379,8 +383,8 @@ function searchPopulationPercent() {
             gdp: {
                 name: "gdp",
                 valPercent: values.gdp / 100,
-                value: 0, //insert value amount
-                slider: false // change to sliderCheck.gdp after getting data
+                value: selectedProperties["API_NY Data_2017"],
+                slider: sliderCheck.gdp
             },
             popDen: {
                 name: "popDen",
@@ -467,8 +471,14 @@ function filterComparison(feature, initialAmount, range, type) {
         featureType = feature.properties.POPDENSITY;
     }  else if (type == "carbonPerCap") {
         featureType = feature.properties.PERCAPCARB;
+        if (featureType >= (initialAmount * (1.0 - range)) &&
+            featureType <= initialAmount) {
+            return true;
+        }
+        return false;
+    } else if (type == "gdp") {
+        featureType = feature.properties["API_NY Data_2017"];
     }
-    //else type gdp
 
     if (featureType >= (initialAmount * (1.0 - range)) &&
         featureType <= (initialAmount * (1.0 + range))) {
@@ -522,8 +532,18 @@ function addMarkerActions(feature) {
     }
     // Because changing color also makes use of the 'feature' object and the switch statement,
     // I joined it with the pop-up function
-    document.getElementsByClassName("leaflet-pane leaflet-marker-pane")[0].lastChild.src =
-            'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-' + color + ".png";
+    var thisMarker = document.getElementsByClassName("leaflet-pane leaflet-marker-pane")[0];
+    thisMarker.lastChild.src = 
+            'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-' + color + ".png"; 
+    console.log(feature.properties["API_NY Data_2017"]);
+    var selected = document.getElementById("dropDown").value;
+    if (feature.properties["API_NY Data_2017"] && selected) {
+        var pop = markerObject[selected]._layers[markerObject[selected]._leaflet_id - 1].feature.properties.PERCAPCARB;
+        thisMarker.lastChild.style.opacity = 1 - 0.8 * (Math.abs(feature.properties.PERCAPCARB - pop) / (0.2 * pop)); 
+        if (thisMarker.lastChild.style.opacity < 0.25) {
+            thisMarker.lastChild.style.opacity = 0.25;
+        }
+    }
 }
 
 // This method removes all the options within the dropdown list
@@ -540,7 +560,7 @@ function removeLocationOptions() {
 function searchCompare() {
     var searchIDs = document.getElementsByClassName("searchID")
 
-    $.getJSON('./Data/GeoJSONFiles/allpoint.geojson', function (data) {
+    $.getJSON('./Data/GeoJSONFiles/everypoint.geojson', function (data) {
         var search;
         var foundLocation = false;
         search = L.geoJson(data, {
