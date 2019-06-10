@@ -1,7 +1,8 @@
 /*
- Full credit goes to https://github.com/8to5Developer
+ Original code credit goes to https://github.com/8to5Developer
  */
 
+ 
  #info{
   border-radius: 5px;
   cursor: pointer;
@@ -9,7 +10,7 @@
 }
 
 /* The Modal (background) */
-.modal {
+.modalHelp {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
   z-index: 1; /* Sit on top */
@@ -23,13 +24,13 @@
 }
 
 /* Modal Content (image) */
-.modal-content {
+/* .modal-content {
   margin: 0;
   display: block;
   color: white;
   padding: 20px;
   width: 80%;
-}
+} */
 
 @-webkit-keyframes zoom {
   from {-webkit-transform:scale(0)}
