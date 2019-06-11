@@ -536,14 +536,17 @@ function addMarkerActions(feature) {
     thisMarker.lastChild.src = 
             'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-' + color + ".png"; 
     console.log(feature.properties["API_NY Data_2017"]);
-    var selected = document.getElementById("dropDown").value;
-    if (feature.properties["API_NY Data_2017"] && selected) {
-        var pop = markerObject[selected]._layers[markerObject[selected]._leaflet_id - 1].feature.properties.PERCAPCARB;
-        thisMarker.lastChild.style.opacity = 1 - 0.8 * (Math.abs(feature.properties.PERCAPCARB - pop) / (0.2 * pop)); 
-        if (thisMarker.lastChild.style.opacity < 0.25) {
-            thisMarker.lastChild.style.opacity = 0.25;
+    if(!isOnCompare){
+        var selected = document.getElementById("dropDown").value;
+        if (feature.properties["API_NY Data_2017"] && selected) {
+            var pop = markerObject[selected]._layers[markerObject[selected]._leaflet_id - 1].feature.properties.PERCAPCARB;
+            thisMarker.lastChild.style.opacity = 1 - 0.8 * (Math.abs(feature.properties.PERCAPCARB - pop) / (0.2 * pop)); 
+            if (thisMarker.lastChild.style.opacity < 0.25) {
+                thisMarker.lastChild.style.opacity = 0.25;
+            }
         }
     }
+    
 }
 
 // This method removes all the options within the dropdown list
