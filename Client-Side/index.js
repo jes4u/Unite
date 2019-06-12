@@ -94,7 +94,7 @@ $(document).ready(function () {
             Items: [
                 {
                     type: "checkbox",
-                    name: "&ensp; GDP",
+                    name: "&ensp; GDP (Limited to country GPD levels)",
                     value: "gdp",
                     onclick: "activateSlider('gdp');",
                     min: sliderValues.gdp.min,
@@ -126,7 +126,7 @@ $(document).ready(function () {
                 },
                 {
                     type: "checkbox",
-                    name: "&ensp;  Carbon Per Capita",
+                    name: "&ensp;  Carbon Per Capita  (lower emissions only)",
                     value: "carbonPerCap",
                     onclick: "activateSlider('carbonPerCap');",
                     min: sliderValues.carbonPerCap.min,
@@ -367,6 +367,12 @@ function searchPopulationPercent() {
 
         var selectedProperties = markerObject[dropDownValue]._layers[markerObject[dropDownValue]._leaflet_id - 1].feature.properties;
 
+        if (selectedProperties.UNITTYPE == 'URBANEXTENT' && sliderCheck.gdp) {
+            document.getElementById("errorModalText").textContent = "GDP not currently working for Urban levels. Sorry.";
+            $('#errorModal').modal("toggle");
+            return;
+        }
+
         var selectedLocation = {
             population: {
                 name: "population",
@@ -400,7 +406,7 @@ function searchPopulationPercent() {
             }
 
         }
-
+        console.log(selectedProperties.UNITTYPE);
         var loop = []
         if(selectedLocation.population.slider) {
             loop.push("population");
@@ -535,15 +541,12 @@ function addMarkerActions(feature) {
     var thisMarker = document.getElementsByClassName("leaflet-pane leaflet-marker-pane")[0];
     thisMarker.lastChild.src = 
             'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-' + color + ".png"; 
-    console.log(feature.properties["API_NY Data_2017"]);
-    if(!isOnCompare){
-        var selected = document.getElementById("dropDown").value;
-        if (feature.properties["API_NY Data_2017"] && selected) {
-            var pop = markerObject[selected]._layers[markerObject[selected]._leaflet_id - 1].feature.properties.PERCAPCARB;
-            thisMarker.lastChild.style.opacity = 1 - 0.8 * (Math.abs(feature.properties.PERCAPCARB - pop) / (0.2 * pop)); 
-            if (thisMarker.lastChild.style.opacity < 0.25) {
-                thisMarker.lastChild.style.opacity = 0.25;
-            }
+    var selected = document.getElementById("dropDown").value;
+    if(!isOnCompare && selected){
+        var pop = markerObject[selected]._layers[markerObject[selected]._leaflet_id - 1].feature.properties.PERCAPCARB;
+        thisMarker.lastChild.style.opacity = 1 - 0.8 * (Math.abs(feature.properties.PERCAPCARB - pop) / (0.3 * pop)); 
+        if (thisMarker.lastChild.style.opacity < 0.3) {
+            thisMarker.lastChild.style.opacity = 0.3;
         }
     }
     
