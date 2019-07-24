@@ -1,3 +1,7 @@
+// This is the default code that comes with nodemon
+// Unite uses no "server-side" code so far resulting 
+// in a very small server.js
+
 const http = require('http');
 const path = require('path');
 const express = require('express');

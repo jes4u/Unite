@@ -71,7 +71,9 @@ $(document).ready(function () {
 
     $("#mapid").height($(window).height()).width($(window).width());
 
-
+    // mymap is our Leaflet variable, here we setup the map using the tile layer open street maps
+    // after we created the project we realized there is another tile layer that can be accessed for free for leaflet
+    // but for now Open Street Maps serves the purpose
     mymap = L.map('mapid').setView([51.505, -0.09], 2);
 
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -563,6 +565,7 @@ function removeLocationOptions() {
     }
 }
 
+// This method controls the search feature in the Compare tab
 function searchCompare() {
     var searchIDs = document.getElementsByClassName("searchID")
 
@@ -612,6 +615,7 @@ function openExplore() {
     dropDownOptions = [];
 }
 
+// Triggered when the Compare tab is selected to set the tab and options up
 function openCompare() {
     markerLayer.clearLayers();
     removeLocationOptions();
